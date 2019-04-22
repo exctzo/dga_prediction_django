@@ -1,0 +1,68 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width" , initial-scale=1, viewport-fit="cover">
+	
+	{% block title %}
+	{% endblock %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}">
+	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+	<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
+
+	{% block customcss %}
+	{% endblock %}
+
+</head>
+<body>
+
+	<!-- Navigation bar -->
+	
+	<div id="navigationBar">
+		<div class="container">
+			<div class="navigationBarLeft">
+				<ul>
+					<li><a href="/">DGA prediction</a></li>
+					{% if request.user.is_superuser %}
+						<li class="des"><a href="/get_model/">Get model</a></li>
+						<li class="des"><a href="/sniff/">Sniffing</a></li>
+						<li class="des"><a href="/sniff/statistic/">Statistic</a></li>
+					{% endif %}
+				</ul>
+			</div>
+			<div class="navigationBarRight">
+				<ul>
+					<li id="navbarToggle">MENU</li>
+					{% if request.user.is_authenticated %}
+						<li class="des"><a href="/logout/?next=/">Logout</a></li>
+						<li class="des"><a href="/profile/">Profile</a></li>
+					{% else %}
+						<li class="des"><a href="/login/">Login</a></li>
+					{% endif %}
+
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	{% block custombody %}
+	{% endblock %}
+
+	<!--<div id="footer">
+		
+	</div>-->
+
+	<script type="text/javascript" src="{% static 'js/navbar.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+
+	{% block customjs %}
+	{% endblock %}
+
+</body>
+</html>

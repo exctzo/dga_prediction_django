@@ -1,0 +1,54 @@
+#register {
+	width: 400px;
+	max-width: 100%;
+	height: auto;
+	margin: 5% auto;
+}
+
+.registerForm {
+	margin-top: 10px;
+}
+
+input[type="text"], input[type="password"], input[type=email] {
+	background-color: #dcdcdc;
+	margin-bottom: 20px;
+	border: 0;
+	width: 100%;
+	padding: 10px;
+	margin-top: 2px;
+	box-sizing: border-box;
+}
+
+input[type=text]:focus, input[type="password"]:focus, input[type=email]:focus {
+	border: 2px solid #a3d39c;
+	background-color: #fff;
+}
+
+.submitButton {
+	text-transform: uppercase;
+	outline: 0;
+	background: #444;
+	width: 100%;
+	border: 0;
+	padding: 15px;
+	color: #FFFFFF;
+	font-size: 14px;
+	-webkit-transition: all 0.3 ease;
+	transition: all 0.3 ease;
+	cursor: pointer;
+}
+
+.submitButton:hover {
+	color: rgb(255, 255, 255);
+	background-color: rgb(141, 132, 132);
+}
+
+.message {
+	margin: 15px 0 0;
+	color: rgb(175, 172, 172);
+	font-size: 12px;
+}
+.message a {
+	color: rgb(76, 175, 80);
+	text-decoration: none;
+}

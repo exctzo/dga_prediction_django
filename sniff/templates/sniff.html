@@ -1,0 +1,26 @@
+{% extends 'navigationbar.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+	<title>Sniffing</title>
+{% endblock %}
+
+{% block customcss %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block custombody %}
+
+	<div id="pageHeading">
+			<p>Sniffing</p>
+	</div>
+
+	<div class="container">
+		<div id="details">
+			<div class="row">
+				<p>Sniffing button with parametres and output information.</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

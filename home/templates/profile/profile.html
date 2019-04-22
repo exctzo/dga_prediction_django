@@ -1,0 +1,27 @@
+{% extends 'navigationbar.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+	<title>User Details</title>
+{% endblock %}
+
+{% block customcss %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block custombody %}
+	
+	<div id="pageHeading">
+		<p>Profile</p>
+	</div>
+
+	<div id="profile">
+		<div class="message">
+			<p><b>Username</b> : {{ user.username }}</p>
+			<p><b>Email</b> : {{ user.email }}</p>
+			<a href="changepassword/">Change Password</a>
+		</div>
+	</div>
+
+{% endblock %}

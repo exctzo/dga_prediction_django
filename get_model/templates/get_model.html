@@ -1,0 +1,61 @@
+{% extends 'navigationbar.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+	<title>Get model</title>
+{% endblock %}
+
+{% block customcss %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/get_model.css' %}">
+{% endblock %}
+
+{% block custombody %}
+
+	<div id="pageHeading">
+			<p>Get model</p>
+	</div>
+
+	<div id="get_model">
+		<div class="modelTop">
+			<table>
+				<td>
+					<button id="toggle1" class="toggleButton" style="color:#4CAF50;" onclick="to_get_data_form()">GET DATA</button>
+				</td>
+				<td>
+					<button id="toggle2" class="toggleButton" style="color: #333232;" onclick="to_train_form()">TRAIN MODEL</button>
+				</td>
+			</table>
+			<br>
+			<form id="getDataForm" action="/get_model/get_data/" method="post" >
+				<span>Getting data for training model:</span>
+				<ul>
+					<li>Download Cisco Umbrella Popularity List (legit).</li>
+					<li>Download Malware Domain by John Bambenek of Bambenek Consulting (dga).</li>
+					<li>Extract second-level domain.</li>
+				</ul>
+				{% csrf_token %}
+				<button type="submit" name="submit" class="submitButton">Prepare</button>
+			</form>
+			<form id="trainForm" style="display:none;" action="/get_model/train_model/" method="post">
+				{% csrf_token %}
+				{% for field in train_form %}
+					<div>
+						<label>{{ field.label }}</label>
+						{{ field }}
+						{{ field.errors }}
+					</div>
+				{% endfor %}
+				<button type="submit" name="submit" class="submitButton">Start</button>
+			</form>
+			<form style="display:none;" action="/get_model/revoke_task/" id="revokeTaskForm" method="post" >
+				{% csrf_token %}
+				<button type="submit" name="submit" class="submitButton">Cancel</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}
+
+{% block customjs %}
+<script type="text/javascript" src="{% static 'js/get_model.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'navigationbar.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+	<title>DGA prediction</title>
+{% endblock %}
+
+{% block customcss %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block custombody %}
+	<div class="container">
+		<div id="details">
+			<div class="message">
+				<div class="messageLeft">
+					<p>WELCOME</p>
+					<p> A Platform made for detection DGA domains.</p>
+				</div>
+				<div class="messageRight">
+					{% if request.user.is_authenticated %}
+						{% if request.user.is_superuser %}
+							<p>Instruction:</p>
+							<p>1. Get model</p>
+							<p>a. Get data</p>
+							<p>b. Train model</p>
+							<p>2. Sniffing traffic</p>
+						{% else %}
+							<p>You shoud be superuser to setting platform.</p>
+						{% endif %}
+					{% endif %}
+				</div>
+			</div>	
+		</div>
+	</div>
+{% endblock %}

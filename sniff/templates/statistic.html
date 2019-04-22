@@ -1,0 +1,26 @@
+{% extends 'navigationbar.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+	<title>Statistic</title>
+{% endblock %}
+
+{% block customcss %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block custombody %}
+	<div id="pageHeading">
+			<p>Statistic</p>
+	</div>
+
+	<div class="container">
+		<div id="details">
+			<div class="row">
+				<p>Links to logs pages (info: hosts:requests:time) + button for create firewall rule.</p>
+				<p>Table active firewall rules and button for detele rule.</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}
