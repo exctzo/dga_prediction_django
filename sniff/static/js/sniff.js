@@ -1,32 +1,14 @@
-var getdataform = $('#getDataForm');
-var trainform = $('#trainForm');
+var sniffform = $('#sniffForm');
 var revokeform = $('#revokeTaskForm');
 
-getdataform.submit(function () {
+sniffform.submit(function () {
     $.ajax({
-        type: getdataform.attr('method'),
-        url: getdataform.attr('action'),
-        data: getdataform.serialize(),
+        type: sniffform.attr('method'),
+        url: sniffform.attr('action'),
+        data: sniffform.serialize(),
         success: function (data) {
             if (data.task_id != null) {
-                get_task_info(data.task_id, getdataform);
-            }
-        },
-        error: function (data) {
-            console.log("Something went wrong!");
-        }
-    });
-    return false;
-});
-    
-trainform.submit(function () {
-    $.ajax({
-        type: trainform.attr('method'),
-        url: trainform.attr('action'),
-        data: trainform.serialize(),
-        success: function (data) {
-            if (data.task_id != null) {
-                get_task_info(data.task_id, trainform);
+                get_task_info(data.task_id, sniffform);
             }
         },
         error: function (data) {
@@ -87,16 +69,13 @@ function get_task_info(task_id, form) {
     });
 }
 
-function to_train_form() {
-    document.getElementById("trainForm").style.display = "block";
-    document.getElementById("getDataForm").style.display = "none";
-    document.getElementById("toggle1").style.color = "#333232";
-    document.getElementById("toggle2").style.color = "#4CAF50";
-}
+function check_proxy() {
 
-function to_get_data_form() {
-    document.getElementById("trainForm").style.display = "none";
-    document.getElementById("getDataForm").style.display = "block";
-    document.getElementById("toggle1").style.color = "#4CAF50";
-    document.getElementById("toggle2").style.color = "#333232";
+    if (document.getElementById("as_proxy").checked == true){
+    document.getElementById("dns_up_ip").style.display = "block";
+    document.getElementById("port").style.display = "block";
+    } else {
+        document.getElementById("dns_up_ip").style.display = "none";
+        document.getElementById("port").style.display = "none";
+    }
 }

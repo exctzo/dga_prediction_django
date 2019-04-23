@@ -35,7 +35,7 @@
 					<li>Extract second-level domain.</li>
 				</ul>
 				{% csrf_token %}
-				<button type="submit" name="submit" class="submitButton">Prepare</button>
+				<button type="submit" name="submit" class="submitButton">Prepare data</button>
 			</form>
 			<form id="trainForm" style="display:none;" action="/get_model/train_model/" method="post">
 				{% csrf_token %}
@@ -46,7 +46,7 @@
 						{{ field.errors }}
 					</div>
 				{% endfor %}
-				<button type="submit" name="submit" class="submitButton">Start</button>
+				<button type="submit" name="submit" class="submitButton">Prepare model</button>
 			</form>
 			<form style="display:none;" action="/get_model/revoke_task/" id="revokeTaskForm" method="post" >
 				{% csrf_token %}

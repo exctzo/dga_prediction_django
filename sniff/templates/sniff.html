@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block customcss %}
-	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/sniff.css' %}">
 {% endblock %}
 
 {% block custombody %}
@@ -16,11 +16,29 @@
 			<p>Sniffing</p>
 	</div>
 
-	<div class="container">
-		<div id="details">
-			<div class="row">
-				<p>Sniffing button with parametres and output information.</p>
-			</div>
-		</div>
+	<div id="sniff">
+		<form id="sniffForm" action="/sniff/" method="post" >
+			{% csrf_token %}
+			<label><b>{{ head }}</b></label>
+			{% for field in sniff_form %}
+				<div>
+					<label>{{ field.label }}</label>
+					{{ field }}
+					{{ field.error }}
+				</div>
+			{% endfor %}
+			<button type="submit" name="submit" class="submitButton">Process capture</button>
+		</form>
+
+
+
+		<form style="display:none;" action="/sniff/revoke_task/" id="revokeTaskForm" method="post" >
+			{% csrf_token %}
+			<button type="submit" name="submit" class="submitButton">Cancel</button>
+		</form>
 	</div>
+{% endblock %}	
+
+{% block customjs %}
+	<script type="text/javascript" src="{% static 'js/sniff.js' %}"></script>
 {% endblock %}
