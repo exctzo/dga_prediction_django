@@ -17,7 +17,12 @@ from threading import Thread
 from scapy.all import *
 from scapy.layers.dns import DNS
 from scapy.layers.inet import IP
+
 from tensorflow.keras.models import load_model
+
+from tensorflow.keras.utils import CustomObjectScope
+from tensorflow.keras.initializers import glorot_uniform
+
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras import backend as K
 
@@ -123,23 +128,16 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
     global pre_domain
     global logger
     global dga_hosts
-    # global dns_up_ip
     global interface_ip
     global session
     global graph
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading model from disk...'})
-    model = load_model('get_model/input data/model.h5')
-    
-    current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up model...'})
-    model.predict(np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,]]))
-    session = K.get_session()
-    graph = tf.get_default_graph()
-    graph.finalize()
+    with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
+        model = load_model('get_model/input_data/model.h5')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for model...'})
-    with open('get_model/input data/training_data.pkl', 'rb') as f:
+    with open('get_model/input_data/training_data.pkl', 'rb') as f:
         training_data = pickle.load(f)
     all_data_dict = pd.concat([training_data['legit'], training_data['dga']], 
                                 ignore_index=False, sort=True)
@@ -147,6 +145,12 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
     valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
     max_features = len(valid_chars) + 1
     maxlen = np.max([len(x) for x in X])
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up model...'})
+    model.predict(np.array([np.zeros(maxlen, dtype=int)]))
+    session = K.get_session()
+    graph = tf.get_default_graph()
+    graph.finalize()
 
     pre_domain = None
 
@@ -176,3 +180,5 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
             # sock.close()
 
     else: sniff(iface=interface, filter="port 53", store=0, prn=packet_callback)
+
+    return {'step' : 'success'}

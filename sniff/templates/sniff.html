@@ -20,13 +20,17 @@
 		<form id="sniffForm" action="/sniff/" method="post" >
 			{% csrf_token %}
 			<label><b>{{ head }}</b></label>
-			{% for field in sniff_form %}
-				<div>
-					<label>{{ field.label }}</label>
-					{{ field }}
-					{{ field.error }}
-				</div>
-			{% endfor %}
+			<br>
+			<label>{{ sniff_form.interface.label }}</label>
+			{{ sniff_form.interface }}
+			<label>{{ sniff_form.as_proxy.label }}</label>
+			{{ sniff_form.as_proxy }}
+			<div id="if_as_proxy" style="display: none">
+				<label>{{ sniff_form.dns_up_ip.label }}</label>
+				{{ sniff_form.dns_up_ip }}
+				<label>{{ sniff_form.port.label }}</label>
+				{{ sniff_form.port }}
+			</div>
 			<button type="submit" name="submit" class="submitButton">Process capture</button>
 		</form>
 

@@ -98,7 +98,7 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'training model...'})
     # Обучение модели.
-    model.fit(X_train, y_train, epochs=epochs,verbose=0, batch_size=1024)
+    model.fit(X_train, y_train, epochs=epochs, batch_size=1024)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving model...'})
     # Сохранение модели на диск.

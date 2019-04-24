@@ -18,12 +18,12 @@ class SniffForm(forms.Form) :
     interface = forms.ChoiceField(label="Interface", choices=INTERFACE_CHOICES, widget=forms.Select(), required=True)
 
     # AS PROXY
-    as_proxy = forms.BooleanField(label="As proxy?", widget=forms.CheckboxInput(attrs={'id': 'as_proxy', 'onclick': 'check_proxy()'}), required=False)
+    as_proxy = forms.BooleanField(label="As proxy?", widget=forms.CheckboxInput(attrs={'id': 'as_proxy', 'onclick': 'check_as_proxy()', 'class' : 'checkBox'}), required=False)
 
     # DNS-UP IP
     gws = ni.gateways()
     gateway_ip = gws['default'][ni.AF_INET][0]
-    dns_up_ip = forms.GenericIPAddressField(label="DNS-UP IP address", widget=forms.TextInput(attrs={'id': 'dns_up_ip', 'style': 'display:none'}), required=False, initial=gateway_ip)
+    dns_up_ip = forms.GenericIPAddressField(label="DNS-UP IP address (suggest gateway)", widget=forms.TextInput(), required=False, initial=gateway_ip)
 
     # Port
-    port = forms.IntegerField(label="Port", widget=forms.NumberInput(attrs={'id': 'port', 'style': 'display:none'}), required=False)
+    port = forms.IntegerField(label="Port", widget=forms.NumberInput(), required=False)

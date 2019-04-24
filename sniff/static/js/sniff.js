@@ -38,7 +38,7 @@ revokeform.submit(function () {
 function get_task_info(task_id, form) {
     $.ajax({
         type: 'get',
-        url: '/get_model/get_task_info/',
+        url: '/sniff/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
             form.html('');
@@ -69,13 +69,11 @@ function get_task_info(task_id, form) {
     });
 }
 
-function check_proxy() {
+function check_as_proxy() {
 
     if (document.getElementById("as_proxy").checked == true){
-    document.getElementById("dns_up_ip").style.display = "block";
-    document.getElementById("port").style.display = "block";
+        document.getElementById("if_as_proxy").style.display = "block";
     } else {
-        document.getElementById("dns_up_ip").style.display = "none";
-        document.getElementById("port").style.display = "none";
+        document.getElementById("if_as_proxy").style.display = "none";
     }
 }

@@ -39,10 +39,11 @@ def sniff(request) :
 			if as_proxy == True:
 				dns_up_ip = form.cleaned_data.get("dns_up_ip")
 				port = form.cleaned_data.get("port")
-			# 	task = task_capture(interface, as_proxy, dns_up_ip, port)
-			# else: task = task_capture(interface, as_proxy, dns_up_ip=None, port=None)
+				task = task_capture.delay(interface, as_proxy, dns_up_ip, port)
+			else: 
+				task = task_capture.delay(interface, as_proxy, dns_up_ip=None, port=None)
 
-			# return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+			return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 	else :
 		form = forms.SniffForm()
 	return render(request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})

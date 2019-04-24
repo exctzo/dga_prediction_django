@@ -6,5 +6,6 @@ home/migrations
 dga_prediction_django/__pycache__
 sniff/__pycache__
 sniff/migrations
+sniff/logs
 .vscode
 db.sqlite3
