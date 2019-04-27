@@ -42,14 +42,13 @@ input[type=text]:focus, input[type="password"]:focus, input[type=email]:focus {
 
 .submitButton:hover {
 	color: rgb(255, 255, 255);
-	background-color: rgb(141, 132, 132);
+	background-color: #8d8484;
 }
 
 .message {
 	margin: 20px 0 0;
 	color: rgb(54, 54, 54);
     font-size: 16px;
-	margin-bottom: 20px;
 	border: 0;
 	width: 100%;
 	padding: 10px;

@@ -56,4 +56,10 @@ def statistic(request) :
 
 	return render(request, 'statistic.html', {'hosts_list':hosts_list, 'requests_list':requests_list})
 
+def statsbyhost(request, pk):
+	requested_host = pk
+	requested_host_details = models.Hosts.objects.get(ip=requested_host)
+	requests_by_host = models.Requests.objects.filter(ip_src=requested_host)
+	
+	return render(request, 'host.html', {'host_details':requested_host_details,'requests':requests_by_host})
 

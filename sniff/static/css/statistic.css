@@ -1,87 +1,51 @@
 #statistic {
 	max-width: 100%;
-	height: auto;	
+	height: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+	flex-wrap: wrap;
 }
 
 .host {
-	width: 800px;
+	width: 300px;
 	margin: 5% auto;
 	box-shadow: 0px 0px 6px 2px #00000080;
+	display: inline-block;
+	padding-top: 15px;
+	margin-right: 25px;
+	margin-left: 25px;
+	margin-bottom: 10px;
 }
 
 .host table {
 	width: 100%;
 	color: #2c2c2c;
+	text-align: center;
 }
 
-.host th, td {
+.host td  {
 	padding: 15px;
-	text-align: left;
 }
 
-.requests table {
-	font-size: 13.5px;
-	width: 100%;
-	background-color: #444;
-	color: #FFFFFF;
-	box-shadow: 0px 0px 6px 2px #00000080;
-}
-
-.requests th, td {
-	padding: 15px;
-	text-align: left;
-}
-
-.blockButton {
+.statsbyhostref {
+	color: #444;
+	text-decoration: none;
+	background-color: #e7e7e7;
+	padding: 10px;
 	text-transform: uppercase;
-	outline: 0;
-	background: #b94c4c;
 	width: 100%;
 	border: 0;
-	padding: 10px;
-	color: #FFFFFF;
-	font-size: 12px;
-	-webkit-transition: all 0.3 ease;
-	transition: all 0.3 ease;
-	cursor: pointer;
+	font-size: 14px;
+	display: inline-block;
+	text-align: center;
 }
 
-.blockButton:hover {
-	background-color: #b66868;
+.statsbyhostref:hover {
+	background-color: #eeeeee;
 }
 
-.unblockButton {
-	text-transform: uppercase;
-	outline: 0;
-	background: #36aa6a;
-	width: 100%;
-	border: 0;
-	padding: 10px;
-	color: #FFFFFF;
-	font-size: 12px;
-	-webkit-transition: all 0.3 ease;
-	transition: all 0.3 ease;
-	cursor: pointer;
-}
-
-.unblockButton:hover {
-	background-color: #50a878;
-}
-
-.showreqsButton {
-	text-transform: uppercase;
-	outline: 0;
-	background: #444;
-	width: 100%;
-	border: 0;
-	padding: 10px;
-	color: #FFFFFF;
-	font-size: 12px;
-	-webkit-transition: all 0.3 ease;
-	transition: all 0.3 ease;
-	cursor: pointer;
-}
-
-.showreqsButton:hover {
-	background-color: #8d8484;
+.statsbyhostref:visited {
+	color: #444;
 }
