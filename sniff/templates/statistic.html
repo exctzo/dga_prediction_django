@@ -14,4 +14,63 @@
 	<div id="pageHeading">
 			<p>Statistic</p>
 	</div>
+
+	{% if hosts_list %}
+		{% for host in hosts_list %}
+		<div class="host">
+			<table>
+				<tr>
+					<td><b>Host IP:</b>    {{ host.ip }}<b></td>
+					<td><b>Requests count:</b>    {{ host.requests_count }}</td>
+					<td style="text-align: right">
+						<button id="showreqsButton" class="showreqsButton" onclick="showrequests()" value=host.ip>Show requests</button>
+						<button id="hidereqsButton" style="display: none" class="showreqsButton" onclick="showrequests()" value=host.ip>Hide requests</button>
+					</td>
+					{% if host.is_blocked %}
+						<td style="text-align: right">
+							<form action="/sniff/unblock_host/" id="unblockHostForm" method="post" >
+								{% csrf_token %}
+								<button type="submit" name="submit" class="unblockButton">Unblock</button>
+							</form>
+						</td>
+					{% else %}
+						<td style="text-align: right">
+							<form action="/sniff/block_host/" id="blockHostForm" method="post" >
+								{% csrf_token %}
+								<button type="submit" name="submit" class="blockButton">Block</button>
+							</form>
+						</td>
+					{% endif %}
+				</tr>
+			</table>
+			<div id=host.ip style="display:none" class="requests">
+				<table>
+					<tr>
+						<th>IP source</th>
+						<th>IP destination</th>
+						<th>Domain name</th>
+						<th>Date</th>
+					</tr>
+					{% for request in requests_list %}
+						{% if host.ip == request.ip_src %}
+							<tr>
+								<td>{{ request.ip_src }}</td>
+								<td>{{ request.ip_dst }}</td>
+								<td>{{ request.qname }}</td>
+								<td>{{ request.date }}</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+		{% endfor %}
+	{% else %}
+    	<p>No hosts are catched.</p>
+	{% endif %}
+
+{% endblock %}
+
+{% block customjs %}
+	<script type="text/javascript" src="{% static 'js/statistic.js' %}"></script>
 {% endblock %}

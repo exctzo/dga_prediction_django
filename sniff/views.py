@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from .tasks import *
 from . import forms
+from . import models
 from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 
@@ -49,6 +50,10 @@ def sniff(request) :
 	return render(request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
 
 def statistic(request) :
-	return render(request, 'statistic.html')
+
+	hosts_list = models.Hosts.objects.order_by("-requests_count")
+	requests_list = models.Requests.objects.order_by("date")
+
+	return render(request, 'statistic.html', {'hosts_list':hosts_list, 'requests_list':requests_list})
 
 

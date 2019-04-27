@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery.decorators import task
 from celery import current_task
+from . import models
 
 import sys
 import iptc
@@ -55,12 +56,15 @@ def checker(qname, ip_src, ip_dst):
         if prediction == [[1]]:
             current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
             logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
-            # # Проверка ip адреса на повторное вхождение в список dga запросов.
-            # if ip_src in dga_hosts:
-            #     dga_hosts[ip_src] = dga_hosts[ip_src] + 1
-            # # Добавление ip в список потенциальных dga-узлов.
-            # else:
-            #     dga_hosts[ip_src] = 1
+            req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname)
+            req.save()
+            try:
+                host = models.Hosts.objects.get(ip=ip_src)
+                host.requests_count += 1
+                host.save()
+            except:
+                host = models.Hosts(ip=ip_src, requests_count=1)
+                host.save()
 
 
 def packet_callback(packet):

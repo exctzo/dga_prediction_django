@@ -9,7 +9,7 @@ $ sudo chmod 755 /etc/init.d/celeryd
 $ sudo chown root:root /etc/init.d/celeryd
 ```
 
-##### Setting configuration file (Options and template can be found in the [docs](http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html)
+##### Setting configuration file (Options and template can be found in the [docs](http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html))
 ```
 $ sudo cp celeryd /etc/default/celeryd
 ```
