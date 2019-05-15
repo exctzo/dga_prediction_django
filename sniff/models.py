@@ -4,7 +4,7 @@ class Requests(models.Model) :
     ip_dst = models.GenericIPAddressField()
     ip_src = models.GenericIPAddressField()
     qname = models.CharField(max_length=250)
-    date = models.DateField(auto_now_add=True)
+    date = models.CharField(max_length=100)
 
 class Hosts(models.Model) :
     ip = models.GenericIPAddressField(primary_key=True)

@@ -29,14 +29,16 @@ sudo nano /var/log/celery/worker1.log
 ```
 
 ### Running django app
-
-#### Create root user for app
-```
-$ python manage.py create superuser
-```
-#### Run server
+#### Make db migrations
 ```
 $ python manage.py makemigrations home get_model sniff
 $ python manage.py migrate
+```
+#### Create root user for app
+```
+$ python manage.py createsuperuser
+```
+#### Run server
+```
 $ python manage.py runserver
 ```

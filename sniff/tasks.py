@@ -8,6 +8,7 @@ import iptc
 import pickle
 import socket
 import logging
+import datetime
 import tldextract
 import numpy as np
 import pandas as pd
@@ -56,7 +57,7 @@ def checker(qname, ip_src, ip_dst):
         if prediction == [[1]]:
             current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
             logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
-            req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname)
+            req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             req.save()
             try:
                 host = models.Hosts.objects.get(ip=ip_src)
@@ -180,7 +181,7 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
             th = Thread(target=handler, args=(data, addr, sock, dns_up_ip, interface))
             th.start()
 
-            # Put to view to safety close socket thread
+            # Put in view to safety close socket thread
             # sock.close()
 
     else: sniff(iface=interface, filter="port 53", store=0, prn=packet_callback)
