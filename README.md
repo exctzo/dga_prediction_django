@@ -1,10 +1,24 @@
 ## Installing
 
-### Running celery as a daemon
-
-##### Download generic celeryd init-script
+### Some prep staff
 ```
-$ sudo wget -P /etc/init.d/ https://github.com/celery/celery/blob/master/extra/generic-init.d/celeryd
+$ sudo apt install python3
+$ sudo apt install python3-dev
+$ sudo apt install python3-distutils
+$ git clone https://github.com/exctzo/dga_prediction_django.git
+$ pip install -r requirements.txt
+```
+
+### Installing Redis as a Celery “Broker”
+```
+$ sudo apt install redis-server
+```
+
+#### Running celery as a daemon
+
+#### Download generic celeryd init-script
+```
+$ sudo wget -P /etc/init.d/ https://raw.githubusercontent.com/celery/celery/master/extra/generic-init.d/celeryd
 $ sudo chmod 755 /etc/init.d/celeryd
 $ sudo chown root:root /etc/init.d/celeryd
 ```
@@ -22,6 +36,10 @@ $ sudo passwd celery
 #### Usage daemon
 ```
 sudo /etc/init.d/celeryd {start|stop|restart|status}
+```
+##### *or run as not a daemon
+```
+celery -A dga_prediction_django worker -l info
 ```
 #### Logs
 ```

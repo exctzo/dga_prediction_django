@@ -9,3 +9,4 @@ sniff/migrations
 sniff/logs
 .vscode
 db.sqlite3
+.idea
