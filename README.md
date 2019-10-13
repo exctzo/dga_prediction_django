@@ -1,3 +1,17 @@
+## Configure machine
+- Setup SSH (change default port to 9999, generate ssh key)
+```
+$ nano /etc/ssh/sshd_config
+$ service ssh restart
+$ ssh-keygen
+```
+- Firewall:
+```
+$ ufw allow 9999,9981,9980,53
+$ ufw enable
+```
+- ...
+
 ## Installing
 
 ### Some prep staff
@@ -64,5 +78,5 @@ $ python manage.py runserver exctzo.tech:9980
 
 #### Testing
 ```
-dig @exctzo.tech -p 9981 ajdhgalksfnwkenglk.com
+$ dig @exctzo.tech -p 9981 ajdhgalksfnwkenglk.com
 ```
