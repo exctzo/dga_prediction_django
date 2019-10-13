@@ -1,4 +1,4 @@
-### Configuring DO VPS
+### Configure DO VPS
 
 - Setup SSH (change default port to 9999, generate ssh key)
 ```
@@ -15,7 +15,7 @@ $ ufw enable
 - Add public ssh key to Github setting page
 - ...
 
-### Installing
+### Install DGA Prediction service
 
 #### Get Python, Redis as celery "Broker" and additional packages 
 ```
@@ -24,7 +24,7 @@ $ git clone https://github.com/exctzo/dga_prediction_django.git
 $ pip3 install -r requirements.txt
 ```
 
-#### Running celery as a daemon
+#### Run celery as a daemon
 
 #### Download generic celeryd init-script
 ```
@@ -57,7 +57,7 @@ $ celery -A dga_prediction_django worker -l info
 $ cat /var/log/celery/worker1.log
 ```
 
-### Running django app
+### Run django app
 #### Make db migrations
 ```
 $ python3 manage.py makemigrations home get_model sniff
@@ -72,7 +72,7 @@ $ python3 manage.py createsuperuser
 $ python3 manage.py runserver exctzo.tech:9980
 ```
 
-#### Testing from local machine
+### Testing system from local machine
 ```
 $ dig @exctzo.tech -p 9981 ajdhgalksfnwkenglk.com
 ```
