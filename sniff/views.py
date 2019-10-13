@@ -1,5 +1,4 @@
 import json
-
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from .tasks import *
@@ -50,8 +49,11 @@ def sniff(request) :
 	return render(request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
 
 def statistic(request) :
-
-	hosts_list = models.Hosts.objects.order_by("-requests_count")
+	if request.user.is_superuser:
+		hosts_list = models.Hosts.objects.order_by("-requests_count")
+	else:
+		local_dns_ip = request.user.first_name
+		hosts_list = models.Hosts.objects.filter(ip=local_dns_ip).order_by("-requests_count")
 	requests_list = models.Requests.objects.order_by("date")
 
 	return render(request, 'statistic.html', {'hosts_list':hosts_list, 'requests_list':requests_list})

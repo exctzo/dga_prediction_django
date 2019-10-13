@@ -9,5 +9,3 @@ class Requests(models.Model) :
 class Hosts(models.Model) :
     ip = models.GenericIPAddressField(primary_key=True)
     requests_count = models.IntegerField()
-    is_blocked = models.BooleanField(default=False)
-
