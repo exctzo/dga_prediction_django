@@ -1,82 +1,78 @@
-## Configure machine
+### Configure DO VPS
+
 - Setup SSH (change default port to 9999, generate ssh key)
 ```
 $ nano /etc/ssh/sshd_config
 $ service ssh restart
 $ ssh-keygen
 ```
-- Firewall:
+
+- Firewall
 ```
 $ ufw allow 9999,9981,9980,53
 $ ufw enable
 ```
+- Add public ssh key to Github setting page
 - ...
 
-## Installing
+### Installing
 
-### Some prep staff
+#### Get Python, Redis as celery "Broker" and additional packages 
 ```
-$ sudo apt install python3
-$ sudo apt install python3-dev
-$ sudo apt install python3-distutils
+$ apt install python3 python3-dev python3-distutils python3-pip redis-server
 $ git clone https://github.com/exctzo/dga_prediction_django.git
-$ pip install -r requirements.txt
-```
-
-### Installing Redis as a Celery “Broker”
-```
-$ sudo apt install redis-server
+$ pip3 install -r requirements.txt
 ```
 
 #### Running celery as a daemon
 
 #### Download generic celeryd init-script
 ```
-$ sudo wget -P /etc/init.d/ https://raw.githubusercontent.com/celery/celery/master/extra/generic-init.d/celeryd
-$ sudo chmod 755 /etc/init.d/celeryd
-$ sudo chown root:root /etc/init.d/celeryd
+$ wget -P /etc/init.d/ https://raw.githubusercontent.com/celery/celery/master/extra/generic-init.d/celeryd
+$ chmod 755 /etc/init.d/celeryd
+$ chown root:root /etc/init.d/celeryd
 ```
 
-##### Setting configuration file (Options and template can be found in the [docs](http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html))
+##### Setting configuration files (Options and template for celery can be found in the [docs](http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html))
 ```
-$ sudo cp celeryd /etc/default/celeryd
-$ sudo cp redis.conf /etc/redis
+$ cp celeryd /etc/default/celeryd
+$ cp redis.conf /etc/redis
 ```
 
 ##### Create user for celery
 ```
-$ sudo useradd -ou 0 -g 0 celery
-$ sudo passwd celery
+$ useradd -ou 0 -g 0 celery
+$ passwd celery
 ```
 #### Usage daemon
 ```
-sudo /etc/init.d/celeryd {start|stop|restart|status}
+$ /etc/init.d/celeryd {start|stop|restart|status}
 ```
 ##### *or run as not a daemon
 ```
-celery -A dga_prediction_django worker -l info
+$ celery -A dga_prediction_django worker -l info
 ```
 #### Logs
 ```
-sudo nano /var/log/celery/worker1.log
+$ cat /var/log/celery/worker1.log
 ```
 
 ### Running django app
 #### Make db migrations
 ```
-$ python manage.py makemigrations home get_model sniff
-$ python manage.py migrate
+$ python3 manage.py makemigrations home get_model sniff
+$ python3 manage.py migrate
 ```
 #### Create root user for app
 ```
-$ python manage.py createsuperuser
+$ python3 manage.py createsuperuser
 ```
 #### Run server
 ```
-$ python manage.py runserver exctzo.tech:9980
+$ python3 manage.py runserver exctzo.tech:9980
 ```
 
-#### Testing
+#### Testing from local machine
 ```
 $ dig @exctzo.tech -p 9981 ajdhgalksfnwkenglk.com
 ```
