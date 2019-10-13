@@ -1,4 +1,4 @@
-### Configure DO VPS
+### Configuring DO VPS
 
 - Setup SSH (change default port to 9999, generate ssh key)
 ```
@@ -7,7 +7,7 @@ $ service ssh restart
 $ ssh-keygen
 ```
 
-- Firewall
+- Firewall setting (9999 - ssh, 9981 - proxy, 9980 - web head, 53 - default dns port)
 ```
 $ ufw allow 9999,9981,9980,53
 $ ufw enable
