@@ -2,7 +2,7 @@
 
 - Setup SSH (change default port to 9999, generate ssh key)
 ```
-$ nano /etc/ssh/sshd_config
+$ sed -ie 's/#Port.*[0-9]$/Port '9999'/gI' /etc/ssh/sshd_config
 $ service ssh restart
 $ ssh-keygen
 ```
