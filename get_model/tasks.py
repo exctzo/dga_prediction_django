@@ -84,7 +84,7 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
     X = [[valid_chars[y] for y in x] for x in X]
     X = sequence.pad_sequences(X, maxlen=maxlen)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=0)
 
     # Построение модели.
     model = Sequential()

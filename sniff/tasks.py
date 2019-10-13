@@ -55,7 +55,8 @@ def checker(qname, ip_src, ip_dst):
             with graph.as_default():
                 prediction = model.predict_classes(X_pred)
         if prediction == [[1]]:
-            current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
+            #get error 'NoneType' object has no attribute 'update_state', idk why
+            #current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
             logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
             req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             req.save()
@@ -110,20 +111,6 @@ def handler(data, addr, socket, dns_up_ip, interface):
     # Проверка dns запроса.
     checker(qname, ip_src, ip_dst)
 
-# @task(name="iptables")
-# def iptables(dga_hosts, logger):
-#     logger = logger_setup()
-#     logger.info("Заблокированные узлы:")
-
-#     for key, val in dga_hosts.items():
-#         if val >= 50:
-#             print("Блокировка узла с IP: %s" % key)
-#             logger.info("IP адрес: %s" % key)
-#             chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
-#             rule = iptc.Rule()
-#             rule.src = key
-#             rule.target = iptc.Target(rule, "DROP")
-#             chain.insert_rule(rule)
 
 @task(name="capture")
 def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):

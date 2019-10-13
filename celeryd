@@ -1,12 +1,12 @@
 CELERYD_NODES="worker1"
 
-CELERY_BIN="/home/exctzo/Github/venv/bin/celery"
+CELERY_BIN="/usr/local/bin/celery"
 
 # App instance to use
 CELERY_APP="dga_prediction_django"
 
 # Where to chdir at start.
-CELERYD_CHDIR="/home/exctzo/Github/dga_prediction_django/"
+CELERYD_CHDIR="/root/dga_prediction_django/"
 
 # Extra command-line arguments to the worker
 CELERYD_OPTS="--time-limit=300 --concurrency=8"

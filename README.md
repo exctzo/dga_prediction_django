@@ -26,6 +26,7 @@ $ sudo chown root:root /etc/init.d/celeryd
 ##### Setting configuration file (Options and template can be found in the [docs](http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html))
 ```
 $ sudo cp celeryd /etc/default/celeryd
+$ sudo cp redis.conf /etc/redis
 ```
 
 ##### Create user for celery
@@ -58,5 +59,10 @@ $ python manage.py createsuperuser
 ```
 #### Run server
 ```
-$ python manage.py runserver
+$ python manage.py runserver exctzo.tech:9980
+```
+
+#### Testing
+```
+dig @exctzo.tech -p 9981 ajdhgalksfnwkenglk.com
 ```
