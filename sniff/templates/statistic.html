@@ -19,9 +19,9 @@
 			{% for host in hosts_list %}
 			<div class="host">
 				<table>
-					<tr><td><b>Host IP:</b>    {{ host.ip }}</td></tr>
-					<tr><td><b>Requests count:</b>    {{ host.requests_count }}</td></tr>
-					<tr><td><a class="statsbyhostref" href="{{ host.ip }}">Show requests</a></td></tr>
+					<tr><td><b>Host IP:</b>    {{ host.ip_src }}</td></tr>
+					<tr><td><b>Requests count:</b>    {{ host.count }}</td></tr>
+					<tr><td><a class="statsbyhostref" href="{{ host.ip_src }}">Show requests</a></td></tr>
 				</table>
 			</div>
 			{% endfor %}

@@ -29,17 +29,17 @@ a:visited {
 	color: #eee;
 }
 
-.navigationBarLeft , .navigationBarRight {
-	width: 45%;
+.navigationBarLeft {
+	width: 55%;
 	line-height: 80px;
 	background-color: #3d3b3b;
-}
-
-.navigationBarLeft {
 	float: left;
 }
 
 .navigationBarRight {
+	width: 45%;
+	line-height: 80px;
+	background-color: #3d3b3b;
 	float: right;
 }
 

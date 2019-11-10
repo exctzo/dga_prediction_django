@@ -54,19 +54,19 @@ def checker(qname, ip_src, ip_dst):
         with session.as_default():
             with graph.as_default():
                 prediction = model.predict_classes(X_pred)
+        req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, report_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'), dga=prediction[0][0])
+        req.save()
         if prediction == [[1]]:
             #get error 'NoneType' object has no attribute 'update_state', idk why
             #current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
             logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
-            req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            req.save()
-            try:
-                host = models.Hosts.objects.get(ip=ip_src)
-                host.requests_count += 1
-                host.save()
-            except:
-                host = models.Hosts(ip=ip_src, requests_count=1)
-                host.save()
+            # try:
+            #     host = models.Hosts.objects.get(ip=ip_src)
+            #     host.requests_count += 1
+            #     host.save()
+            # except:
+            #     host = models.Hosts(ip=ip_src, requests_count=1)
+            #     host.save()
 
 
 def packet_callback(packet):

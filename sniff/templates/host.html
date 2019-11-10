@@ -12,14 +12,14 @@
 
 {% block custombody %}
 	<div id="pageHeading">
-			<p>Statistic by {{ host_details.ip }} </p>
+			<p>Statistic by {{ host }} </p>
 	</div>
 
 	<div class="host">
 		<table>
 			<tr>
-				<td><b>Host IP:</b>    {{ host_details.ip }}</td>
-				<td><b>Requests count:</b>    {{ host_details.requests_count }}</td>
+				<td><b>Host IP:</b>    {{ host }}</td>
+				<td><b>Count DGA requests relatively all requests:</b> {{ count_dga_requests.count }}/{{ count_requests.count }}</td>
 			</tr>
 		</table>
 		<div class="requests">
@@ -28,14 +28,16 @@
 					<th>IP source</th>
 					<th>IP destination</th>
 					<th>Domain name</th>
-					<th>Date</th>
+					<th>Report date</th>
+					<th>DGA</th>
 				</tr>
 				{% for request in requests %}
 					<tr>
 						<td>{{ request.ip_src }}</td>
 						<td>{{ request.ip_dst }}</td>
 						<td>{{ request.qname }}</td>
-						<td>{{ request.date }}</td>
+						<td>{{ request.report_date }}</td>
+						<td>{{ request.dga }}</td>
 					</tr>
 				{% endfor %}
 			</table>
