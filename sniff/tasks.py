@@ -53,20 +53,32 @@ def checker(qname, ip_src, ip_dst):
         # Предсказание типа доменного имени.
         with session.as_default():
             with graph.as_default():
-                prediction = model.predict_classes(X_pred)
-        req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, report_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'), dga=prediction[0][0])
-        req.save()
-        if prediction == [[1]]:
-            #get error 'NoneType' object has no attribute 'update_state', idk why
-            #current_task.update_state(state='PROGRESS', meta={'step' : ip_src + ' --> ' + ip_dst + ' : ' + qname})
+                pred_class = model.predict_classes(X_pred)[0][0]
+                pred_proba = model.predict_classes(X_pred)[0][0]
+
+        if pred_class == 0:
+            n_class = 'Legit'
+        else:
+            n_class = 'DGA'
+
+        #get error 'NoneType' object has no attribute 'update_state', idk why
+        current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + n_class + ', Route: ' + ip_src + ' --> ' + ip_dst + ', QNAME: ' + qname})
+
+        if pred_class == 1:
+
+            # Предсказание подтипа DGA доменного имени.
+            with session.as_default():
+                with graph.as_default():
+                    pred_subclass = model_dga.predict_classes(X_pred)
+                    pred_subproba = model_dga.predict_proba(X_pred)
+                    pred_family = family_dict[pred_subclass[0]]
+                    pred_family_prob = pred_subproba[0][pred_subclass[0]]
+            #
             logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
-            # try:
-            #     host = models.Hosts.objects.get(ip=ip_src)
-            #     host.requests_count += 1
-            #     host.save()
-            # except:
-            #     host = models.Hosts(ip=ip_src, requests_count=1)
-            #     host.save()
+        # 
+        req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, report_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
+                            dga=pred_class, dga_proba=pred_proba, dga_subtype=pred_family, dga_subtype_proba = pred_family_prob)
+        req.save()
 
 
 def packet_callback(packet):
@@ -115,7 +127,9 @@ def handler(data, addr, socket, dns_up_ip, interface):
 @task(name="capture")
 def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
     global model
+    global model_dga
     global valid_chars
+    global family_dict
     global maxlen
     global pre_domain
     global logger
@@ -124,22 +138,30 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
     global session
     global graph
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'loading model from disk...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'loading first model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
         model = load_model('get_model/input_data/model.h5')
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'loading second model from disk...'})
+    with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
+        model_dga = load_model('get_model/input_data/model_dga.h5')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for model...'})
     with open('get_model/input_data/training_data.pkl', 'rb') as f:
         training_data = pickle.load(f)
     all_data_dict = pd.concat([training_data['legit'], training_data['dga']], 
                                 ignore_index=False, sort=True)
+    #dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
+    family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
     X = np.array(all_data_dict['domain'].tolist())
+    #X_dga = np.array(dga_data_dict['domain'].tolist())
     valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
     max_features = len(valid_chars) + 1
     maxlen = np.max([len(x) for x in X])
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up model...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up models...'})
     model.predict(np.array([np.zeros(maxlen, dtype=int)]))
+    model_dga.predict(np.array([np.zeros(maxlen, dtype=int)]))
     session = K.get_session()
     graph = tf.get_default_graph()
     graph.finalize()

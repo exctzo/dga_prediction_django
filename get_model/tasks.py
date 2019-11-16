@@ -46,6 +46,7 @@ def task_get_data():
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
     domain_list['family'] = domain_list['family'].map(lambda x: x.split(' ')[3])
     domain_list['type'] = 1
+    domain_list['subtype'] = pd.factorize(domain_list.family)[0]
     training_data['dga'] = domain_list
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
@@ -65,11 +66,18 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
 
     # Общая коллекция данных.
     all_data_dict = pd.concat([training_data['legit'], training_data['dga']], ignore_index=False, sort=True)
+    dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
+
+    # Словарь с семьями DGA
+    family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
+    classes = len(family_dict)
 
     # Массив x хранит образцы обучения.
     # В массиве y хранятся целевые значения (метки типов) для образцов обучения.
     X = np.array(all_data_dict['domain'].tolist())
     y = np.array(all_data_dict['type'].tolist())
+    X_dga = np.array(dga_data_dict['domain'].tolist())
+    y_dga = np.array(dga_data_dict['subtype'].tolist())
 
     # Создание словаря действительных символов.
     valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
@@ -83,8 +91,11 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
     # Преобразование символов в int и pad (последовательности одиннаковой длины).
     X = [[valid_chars[y] for y in x] for x in X]
     X = sequence.pad_sequences(X, maxlen=maxlen)
+    X_dga = [[valid_chars[y] for y in x] for x in X_dga]
+    X_dga = sequence.pad_sequences(X_dga, maxlen=maxlen)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0.2, random_state=0)
 
     # Построение модели.
     model = Sequential()
@@ -94,14 +105,38 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
     model.add(Dense(1))
     model.add(Activation(act_func))
     model.compile(loss='binary_crossentropy', optimizer='rmsprop')
-    model.summary()
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'training model...'})
-    # Обучение модели.
-    model.fit(X_train, y_train, epochs=epochs, batch_size=1024)
+    # Построение модели.
+    model_dga = Sequential()
+    model_dga.add(Embedding(max_features, 128, input_length=maxlen))
+    model_dga.add(LSTM(128))
+    model_dga.add(Dropout(rate=drop_rate))
+    model_dga.add(Dense(classes))
+    model_dga.add(Activation(act_func))
+    model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'saving model...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'training first model...'})
+    best_auc = 0.0
+    for ep in range(epochs):
+        # Обучение модели.
+        model.fit(X_train, y_train, epochs=1, batch_size=1024)
+
+        y_score = model.predict_proba(X_test)
+        auc = sklearn.metrics.roc_auc_score(y_test, y_score)
+
+        status = 'Epoch %d: auc = %f (best=%f)' % (ep, auc, best_auc)
+        current_task.update_state(state='PROGRESS', meta={'step' : status})
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'saving first model...'})
     # Сохранение модели на диск.
     model.save('get_model/input_data/model.h5')
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'training second model...'})
+    # Обучение модели.
+    model_dga.fit(X_dga_train, y_dga_train, epochs=epochs, batch_size=1024)
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'saving second model...'})
+    # Сохранение модели на диск.
+    model_dga.save('get_model/input_data/model_dga.h5')
 
     return {'step' : 'model is prepared.'}
