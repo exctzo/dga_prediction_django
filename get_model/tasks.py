@@ -16,6 +16,7 @@ from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, LSTM
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
 from tensorflow.keras.callbacks import EarlyStopping
 
 
@@ -65,8 +66,8 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
         training_data = pickle.load(f)
 
     # Общая коллекция данных.
-    all_data_dict = pd.concat([training_data['legit'], training_data['dga']], ignore_index=False, sort=True)
-    dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
+    all_data_dict = pd.concat([training_data['legit'][:100000], training_data['dga'][:100000]], ignore_index=False, sort=True)
+    dga_data_dict = pd.concat([training_data['dga'][:100000]], ignore_index=True)
 
     # Словарь с семьями DGA
     family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
@@ -108,35 +109,42 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
 
     # Построение модели.
     model_dga = Sequential()
-    model_dga.add(Embedding(max_features, 128, input_length=maxlen))
-    model_dga.add(LSTM(128))
+    model_dga.add(Embedding(max_features, output_dim, input_length=maxlen))
+    model_dga.add(LSTM(lstm_units))
     model_dga.add(Dropout(rate=drop_rate))
     model_dga.add(Dense(classes))
     model_dga.add(Activation(act_func))
     model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'training first model...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'training dga prediction model...'})
     best_auc = 0.0
     for ep in range(epochs):
+
         # Обучение модели.
-        model.fit(X_train, y_train, epochs=1, batch_size=1024)
+        model.fit(X_train, y_train, epochs=1, batch_size=batch_size)
 
         y_score = model.predict_proba(X_test)
-        auc = sklearn.metrics.roc_auc_score(y_test, y_score)
+        auc = roc_auc_score(y_test, y_score)
 
-        status = 'Epoch %d: auc = %f (best=%f)' % (ep, auc, best_auc)
+        if auc > best_auc:
+            best_auc = auc
+
+        status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, auc, best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : status})
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'saving first model...'})
-    # Сохранение модели на диск.
-    model.save('get_model/input_data/model.h5')
+    current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'training second model...'})
+    # Сохранение модели на диск.
+    model.save('get_model/input_data/dga_prediction_model.h5')
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'training family prediction model...'})
+
     # Обучение модели.
-    model_dga.fit(X_dga_train, y_dga_train, epochs=epochs, batch_size=1024)
+    model_dga.fit(X_dga_train, y_dga_train, epochs=epochs, batch_size=batch_size)
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'saving second model...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
+
     # Сохранение модели на диск.
-    model_dga.save('get_model/input_data/model_dga.h5')
+    model_dga.save('get_model/input_data/family_prediction_model.h5')
 
-    return {'step' : 'model is prepared.'}
+    return {'step' : 'models are prepared.'}

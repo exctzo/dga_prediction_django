@@ -76,6 +76,7 @@ class Dashboard(TemplateView):
 	template_name = 'dash.html'
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
-		context['lineplot'] = plots.line_plot()
-		context['piechart'] = plots.pie_chart()
+		context['dga_lineplot'] = plots.dga_lineplot()
+		context['hosts_piechart'] = plots.hosts_piechart()
+		context['families_piechart'] = plots.families_piechart()
 		return context

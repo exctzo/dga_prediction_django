@@ -81,8 +81,8 @@ a:visited {
 	vertical-align: middle;
 	font-size: 24px;
 	font-weight: bold;
-	font-family: 'Lato';
-	letter-spacing: 2px;
+	font-family: 'Roboto';
+	letter-spacing: 1px;
 }
 
 @media screen and (max-width: 1200px) {

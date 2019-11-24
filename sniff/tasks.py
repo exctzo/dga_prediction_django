@@ -64,6 +64,9 @@ def checker(qname, ip_src, ip_dst):
         #get error 'NoneType' object has no attribute 'update_state', idk why
         current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + n_class + ', Route: ' + ip_src + ' --> ' + ip_dst + ', QNAME: ' + qname})
 
+        pred_family = None
+        pred_family_prob = None
+
         if pred_class == 1:
 
             # Предсказание подтипа DGA доменного имени.
@@ -138,18 +141,18 @@ def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
     global session
     global graph
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'loading first model from disk...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'loading dga prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
-        model = load_model('get_model/input_data/model.h5')
+        model = load_model('get_model/input_data/dga_prediction_model.h5')
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'loading second model from disk...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'loading family prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
-        model_dga = load_model('get_model/input_data/model_dga.h5')
+        model_dga = load_model('get_model/input_data/family_prediction_model.h5')
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for model...'})
+    current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for models...'})
     with open('get_model/input_data/training_data.pkl', 'rb') as f:
         training_data = pickle.load(f)
-    all_data_dict = pd.concat([training_data['legit'], training_data['dga']], 
+    all_data_dict = pd.concat([training_data['legit'][:100000], training_data['dga'][:100000]], 
                                 ignore_index=False, sort=True)
     #dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
     family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}

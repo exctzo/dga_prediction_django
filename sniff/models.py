@@ -7,8 +7,8 @@ class Requests(models.Model) :
     report_date = models.DateField()
     dga = models.IntegerField()
     dga_proba = models.FloatField()
-    dga_subtype = models.CharField(max_length=250)
-    dga_subtype_proba = models.FloatField()
+    dga_subtype = models.CharField(max_length=250,null=True)
+    dga_subtype_proba = models.FloatField(null=True)
 
 # class Hosts(models.Model) :
 #     ip = models.GenericIPAddressField(primary_key=True)
