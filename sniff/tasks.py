@@ -61,7 +61,7 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
         else:
             lv_n_class = 'DGA'
 
-        gv_celery_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + lv_n_class + ', Route: ' + iv_ip_src + ' --> ' + iv_ip_dst + ', QNAME: ' + iv_qname})
+        # current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + lv_n_class + ', Route: ' + iv_ip_src + ' --> ' + iv_ip_dst + ', QNAME: ' + iv_qname})
 
         lv_pred_family = None
         lv_pred_family_prob = None
@@ -136,9 +136,6 @@ def task_capture(iv_interface, iv_as_proxy=False, iv_dns_up_ip=None, iv_port=Non
     global gv_session
     global gv_graph
     global gv_pre_domain
-    global gv_celery_task
-
-    gv_celery_task = current_task
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading dga prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
