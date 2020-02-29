@@ -61,8 +61,8 @@ def checker(qname, ip_src, ip_dst):
         else:
             n_class = 'DGA'
 
-        #get error 'NoneType' object has no attribute 'update_state', idk why
-        current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + n_class + ', Route: ' + ip_src + ' --> ' + ip_dst + ', QNAME: ' + qname})
+        # get error 'NoneType' object has no attribute 'update_state', idk why
+        # current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + n_class + ', Route: ' + ip_src + ' --> ' + ip_dst + ', QNAME: ' + qname})
 
         pred_family = None
         pred_family_prob = None

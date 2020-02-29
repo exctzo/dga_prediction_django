@@ -26,4 +26,4 @@ class SniffForm(forms.Form) :
     dns_up_ip = forms.GenericIPAddressField(label="DNS-UP IP address (suggest gateway)", widget=forms.TextInput(), required=False, initial=gateway_ip)
 
     # Port
-    port = forms.IntegerField(label="Port", widget=forms.NumberInput(), required=False)
+    port = forms.IntegerField(label="Port", widget=forms.NumberInput(), required=False, initial=9981)

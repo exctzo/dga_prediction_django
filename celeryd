@@ -9,7 +9,7 @@ CELERY_APP="dga_prediction_django"
 CELERYD_CHDIR="/root/dga_prediction_django/"
 
 # Extra command-line arguments to the worker
-CELERYD_OPTS="--time-limit=300 --concurrency=8"
+CELERYD_OPTS="--time-limit=300 --concurrency=3"
 
 # Set logging level to DEBUG
 #CELERYD_LOG_LEVEL="WARNING"

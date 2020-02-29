@@ -10,7 +10,7 @@ celery==4.3.0
 certifi==2018.1.18
 chardet==3.0.4
 click==6.7
-cloud-init==19.2
+#cloud-init==19.2
 colorama==0.3.7
 command-not-found==0.3
 configobj==5.0.6
@@ -57,7 +57,7 @@ pygobject==3.26.1
 PyJWT==1.5.3
 pyOpenSSL==17.5.0
 pyserial==3.4
-python-apt==1.6.4
+#python-apt==1.6.4
 python-crontab==2.3.9
 python-dateutil==2.8.0
 python-debian==0.1.32
@@ -93,3 +93,4 @@ Werkzeug==0.16.0
 wrapt==1.11.2
 zipp==0.6.0
 zope.interface==4.3.2
+plotly

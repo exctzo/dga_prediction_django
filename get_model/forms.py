@@ -28,4 +28,4 @@ class TrainForm(forms.Form) :
     epochs = forms.IntegerField(label="Epoch", widget=forms.NumberInput(),  initial=1)
 
     # batch_size
-    batch_size = forms.IntegerField(label="Batch size", widget=forms.NumberInput(),  initial=1024)
+    batch_size = forms.IntegerField(label="Batch size", widget=forms.NumberInput(),  initial=128)
