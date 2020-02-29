@@ -32,24 +32,24 @@ def revoke_task(request):
 	task_id = list(active_tasks.values())[0][0]["id"]
 	revoke(task_id, terminate=True)
 
-def sniff(request) :
-	if request.method == 'POST' :
-		form = forms.SniffForm(request.POST)
-		if form.is_valid() :
-			interface = form.cleaned_data.get("interface")
-			as_proxy = form.cleaned_data.get("as_proxy")
+def sniff(iv_request) :
+	if iv_request.method == 'POST' :
+		lv_form = forms.SniffForm(iv_request.POST)
+		if lv_form.is_valid() :
+			lv_interface = lv_form.cleaned_data.get("interface")
+			lv_as_proxy = lv_form.cleaned_data.get("as_proxy")
 
-			if as_proxy == True:
-				dns_up_ip = form.cleaned_data.get("dns_up_ip")
-				port = form.cleaned_data.get("port")
-				task = task_capture.delay(interface, as_proxy, dns_up_ip, port)
+			if lv_as_proxy == True:
+				lv_dns_up_ip = lv_form.cleaned_data.get("dns_up_ip")
+				lv_port = lv_form.cleaned_data.get("port")
+				lv_task = task_capture.delay(lv_interface, lv_as_proxy, lv_dns_up_ip, lv_port)
 			else: 
-				task = task_capture.delay(interface, as_proxy, dns_up_ip=None, port=None)
+				lv_task = task_capture.delay(lv_interface, lv_as_proxy, None, None)
 
-			return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+			return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else :
-		form = forms.SniffForm()
-	return render(request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
+		lv_form = forms.SniffForm()
+	return render(iv_request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
 
 def statistic(request) :
 	if request.user.is_superuser:

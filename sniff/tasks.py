@@ -29,173 +29,167 @@ from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras import backend as K
 
 def logger_setup():
-    directory = os.path.dirname('sniff/logs/')
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    logger = logging.getLogger(__name__)
-    hdlr = logging.FileHandler('sniff/logs/' + datetime.now().strftime("%Y%m%d_%H%M") + '.log')
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    hdlr.setFormatter(formatter)
-    logger.addHandler(hdlr)
-    logger.setLevel(logging.INFO)
-    return logger
+    lv_directory = os.path.dirname('sniff/logs/')
+    if not os.path.exists(lv_directory):
+        os.makedirs(lv_directory)
+    lv_logger = logging.getLogger(__name__)
+    lv_hdlr = logging.FileHandler('sniff/logs/' + datetime.now().strftime("%Y%m%d_%H%M") + '.log')
+    lv_formatter = logging.Formatter('%(asctime)s - %(message)s')
+    lv_hdlr.setFormatter(lv_formatter)
+    lv_logger.addHandler(lv_hdlr)
+    lv_logger.setLevel(logging.INFO)
+    return lv_logger
 
-def checker(qname, ip_src, ip_dst):
-    global pre_domain
-    ext_qname = tldextract.extract(qname)
+def checker(iv_qname, iv_ip_src, iv_ip_dst):
+    gv_pre_domain = None
+    lv_ext_qname = tldextract.extract(iv_qname)
     # Отсеивание с длиной < 6 и != предыдущему запросу.
-    if len(ext_qname.domain) > 6 and ext_qname.domain != pre_domain:
+    if len(lv_ext_qname.domain) > 6 and lv_ext_qname.domain != gv_pre_domain:
         # Преобразование домена в последовательность int с одиннаковой длиной.
-        seq = list(ext_qname.domain)
-        X_pred = [valid_chars[y] for y in seq]
-        X_pred = sequence.pad_sequences([X_pred], maxlen=maxlen)
-        pre_domain = ext_qname.domain
+        lv_seq = list(lv_ext_qname.domain)
+        lv_x_pred = [gv_valid_chars[y] for y in lv_seq]
+        lv_x_pred = sequence.pad_sequences([lv_x_pred], maxlen=gv_maxlen)
+        gv_pre_domain = lv_ext_qname.domain
         # Предсказание типа доменного имени.
-        with session.as_default():
-            with graph.as_default():
-                pred_class = model.predict_classes(X_pred)[0][0]
-                pred_proba = model.predict_classes(X_pred)[0][0]
+        with gv_session.as_default():
+            with gv_graph.as_default():
+                lv_pred_class = gv_model.predict_classes(lv_x_pred)[0][0]
+                lv_pred_proba = gv_model.predict_classes(lv_x_pred)[0][0]
 
-        if pred_class == 0:
-            n_class = 'Legit'
+        if lv_pred_class == 0:
+            lv_n_class = 'Legit'
         else:
-            n_class = 'DGA'
+            lv_n_class = 'DGA'
 
-        # get error 'NoneType' object has no attribute 'update_state', idk why
-        # current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + n_class + ', Route: ' + ip_src + ' --> ' + ip_dst + ', QNAME: ' + qname})
+        gv_celery_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + lv_n_class + ', Route: ' + iv_ip_src + ' --> ' + iv_ip_dst + ', QNAME: ' + iv_qname})
 
-        pred_family = None
-        pred_family_prob = None
+        lv_pred_family = None
+        lv_pred_family_prob = None
 
-        if pred_class == 1:
-
+        if lv_pred_class == 1:
             # Предсказание подтипа DGA доменного имени.
-            with session.as_default():
-                with graph.as_default():
-                    pred_subclass = model_dga.predict_classes(X_pred)
-                    pred_subproba = model_dga.predict_proba(X_pred)
-                    pred_family = family_dict[pred_subclass[0]]
-                    pred_family_prob = pred_subproba[0][pred_subclass[0]]
-            #
-            logger.info(ip_src + ' --> ' + ip_dst + ' : ' + qname)
-        # 
-        req = models.Requests(ip_dst=ip_dst, ip_src=ip_src, qname=qname, report_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
-                            dga=pred_class, dga_proba=pred_proba, dga_subtype=pred_family, dga_subtype_proba = pred_family_prob)
-        req.save()
+            with gv_session.as_default():
+                with gv_graph.as_default():
+                    lv_pred_subclass = gv_model_dga.predict_classes(lv_x_pred)
+                    lv_pred_subproba = gv_model_dga.predict_proba(lv_x_pred)
+                    lv_pred_family = gv_family_dict[lv_pred_subclass[0]]
+                    lv_pred_family_prob = lv_pred_subproba[0][lv_pred_subclass[0]]
+            # Сохранение в логах
+            gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
+        # Сохранение в базе
+        lv_req = models.Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob)
+        lv_req.save()
 
 
-def packet_callback(packet):
+def packet_callback(iv_packet):
     # Отсеивание выходящих пакетов
-    if IP in packet and packet[IP].src != interface_ip:
-        ip_src = packet[IP].src
-        ip_dst = packet[IP].dst
+    if IP in iv_packet and iv_packet[IP].src != gv_interface_ip:
+        lv_ip_src = iv_packet[IP].src
+        lv_ip_dst = iv_packet[IP].dst
         # Нахождение dns запросов, извлечение запрашиваемого домена.
-        if packet.haslayer(DNS) and packet.getlayer(DNS).qr == 0:
-            qname = packet.getlayer(DNS).qd.qname.decode("utf-8")
+        if iv_packet.haslayer(DNS) and iv_packet.getlayer(DNS).qr == 0:
+            lv_qname = iv_packet.getlayer(DNS).qd.qname.decode("utf-8")
             # Проверка dns запроса.
-            checker(qname, ip_src, ip_dst)
+            checker(lv_qname, lv_ip_src, lv_ip_dst)
 
 
-def sendTCP(dns_up_ip, query):
+def sendTCP(iv_dns_up_ip, iv_query):
     # Отправка tcp запросов на вышестоящий dns сервер.
-    server = (dns_up_ip, 53)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(server)
+    lv_server = (iv_dns_up_ip, 53)
+    lv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    lv_sock.connect(lv_server)
 
     # Перестройка tcp запроса на основе udp.
-    pay = chr(len(query))
-    tcp_query = b'\x00' + pay.encode() + query
+    lv_pay = chr(len(iv_query))
+    lv_tcp_query = b'\x00' + lv_pay.encode() + iv_query
 
-    sock.send(tcp_query)  	
-    data = sock.recv(1024)
-    return data
+    lv_sock.send(lv_tcp_query)  	
+    lv_data = lv_sock.recv(1024)
+    return lv_data
 
 
-def handler(data, addr, socket, dns_up_ip, interface):
+def handler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
     # Новый поток для обработки udp запроса на tcp запрос.
-    TCPanswer = sendTCP(dns_up_ip, data)
-    UDPanswer = TCPanswer[2:]
-    socket.sendto(UDPanswer, addr)
+    lv_TCPanswer = sendTCP(iv_dns_up_ip, iv_data)
+    lv_UDPanswer = lv_TCPanswer[2:]
+    iv_socket.sendto(lv_UDPanswer, iv_addr)
 
     # Извлечение запрашиваемого домена, ip адресов.
-    ip_src = addr[0]
-    ip_dst = interface_ip
-    layerDNS = DNS(data)
-    qname = layerDNS.qd.qname.decode("utf-8")
+    lv_ip_src = iv_addr[0]
+    lv_ip_dst = gv_interface_ip
+    lv_layerDNS = DNS(iv_data)
+    lv_qname = lv_layerDNS.qd.qname.decode("utf-8")
 
     # Проверка dns запроса.
-    checker(qname, ip_src, ip_dst)
+    checker(lv_qname, lv_ip_src, lv_ip_dst)
 
 
 @task(name="capture")
-def task_capture(interface, as_proxy=False, dns_up_ip=None, port=None):
-    global model
-    global model_dga
-    global valid_chars
-    global family_dict
-    global maxlen
-    global pre_domain
-    global logger
-    global dga_hosts
-    global interface_ip
-    global session
-    global graph
+def task_capture(iv_interface, iv_as_proxy=False, iv_dns_up_ip=None, iv_port=None):
+    global gv_model
+    global gv_model_dga
+    global gv_valid_chars
+    global gv_family_dict
+    global gv_maxlen
+    global gv_logger
+    global gv_interface_ip
+    global gv_session
+    global gv_graph
+    global gv_pre_domain
+    global gv_celery_task
+
+    gv_celery_task = current_task
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading dga prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
-        model = load_model('get_model/input_data/dga_prediction_model.h5')
+        gv_model = load_model('get_model/input_data/dga_prediction_model.h5')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading family prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
-        model_dga = load_model('get_model/input_data/family_prediction_model.h5')
+        gv_model_dga = load_model('get_model/input_data/family_prediction_model.h5')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for models...'})
     with open('get_model/input_data/training_data.pkl', 'rb') as f:
-        training_data = pickle.load(f)
-    all_data_dict = pd.concat([training_data['legit'][:100000], training_data['dga'][:100000]], 
+        lv_training_data = pickle.load(f)
+    lv_all_data_dict = pd.concat([lv_training_data['legit'][:100000], lv_training_data['dga'][:100000]], 
                                 ignore_index=False, sort=True)
-    #dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
-    family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
-    X = np.array(all_data_dict['domain'].tolist())
-    #X_dga = np.array(dga_data_dict['domain'].tolist())
-    valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
-    max_features = len(valid_chars) + 1
-    maxlen = np.max([len(x) for x in X])
+    #lv_dga_data_dict = pd.concat([lv_training_data['dga']], ignore_index=True)
+    gv_family_dict = {idx+1:x for idx, x in enumerate(lv_training_data['dga']['family'].unique())}
+    X = np.array(lv_all_data_dict['domain'].tolist())
+    #lv_x_dga = np.array(lv_dga_data_dict['domain'].tolist())
+    gv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
+    #lv_max_features = len(gv_valid_chars) + 1
+    gv_maxlen = np.max([len(x) for x in X])
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up models...'})
-    model.predict(np.array([np.zeros(maxlen, dtype=int)]))
-    model_dga.predict(np.array([np.zeros(maxlen, dtype=int)]))
-    session = K.get_session()
-    graph = tf.get_default_graph()
-    graph.finalize()
+    gv_model.predict(np.array([np.zeros(gv_maxlen, dtype=int)]))
+    gv_model_dga.predict(np.array([np.zeros(gv_maxlen, dtype=int)]))
+    gv_session = K.get_session()
+    gv_graph = tf.get_default_graph()
+    gv_graph.finalize()
 
-    pre_domain = None
-
-    # # Подсчет вхождений отдельных dga-узлов.
-    # dga_hosts = {}
-
-    logger = logger_setup()
-    logger.info("Запросы содержащие DGA-домены:")
+    gv_logger = logger_setup()
+    gv_logger.info("Запросы содержащие DGA-домены:")
     
     # Получение ip адреса интерфейса.
-    addr = ni.ifaddresses(interface)
-    interface_ip = addr[ni.AF_INET][0]['addr']
+    lv_addr = ni.ifaddresses(iv_interface)
+    gv_interface_ip = lv_addr[ni.AF_INET][0]['addr']
     
     current_task.update_state(state='PROGRESS', meta={'step' : 'capturing requests...'})
     # Основной процесс, сканирование сети.
-    if as_proxy == True:
-        host = ''
+    if iv_as_proxy == True:
+        lv_host = ''
         # Настройка udp сервера для получения dns запросов.
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind((host, port))
+        lv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        lv_sock.bind((lv_host, iv_port))
         while True:
-            data, addr = sock.recvfrom(1024)
-            th = Thread(target=handler, args=(data, addr, sock, dns_up_ip, interface))
-            th.start()
+            lv_data, lv_addr = lv_sock.recvfrom(1024)
+            lv_th = Thread(target=handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
+            lv_th.start()
 
             # Put in view to safety close socket thread
-            # sock.close()
+            # lv_sock.close()
 
-    else: sniff(iface=interface, filter="port 53", store=0, prn=packet_callback)
+    else: sniff(iface=iv_interface, filter="port 53", store=0, prn=packet_callback)
 
     return {'step' : 'success'}
