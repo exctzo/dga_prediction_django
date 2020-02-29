@@ -11,8 +11,8 @@ class TrainForm(forms.Form) :
     # Embedding layer (128) min=max_features
     output_dim = forms.IntegerField(label="Output dim (Embedding layer)", widget=forms.NumberInput(), initial=128)
 
-    # LSTM units (128): Positive integer, dimensionality of the output space.
-    lstm_units = forms.IntegerField(label="LSTM units", widget=forms.NumberInput(), initial=128)
+    # GRU units (128): Positive integer, dimensionality of the output space.
+    gru_units = forms.IntegerField(label="GRU units", widget=forms.NumberInput(), initial=128)
 
     # Dropout rate (0.5)
     drop_rate = forms.FloatField(label="Dropout rate (float)", widget=forms.NumberInput(), initial=0.5)

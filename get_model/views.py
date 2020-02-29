@@ -55,12 +55,12 @@ def train_model(request) :
 		form = forms.TrainForm(request.POST)
 		if form.is_valid() :
 			output_dim = form.cleaned_data.get("output_dim")
-			lstm_units = form.cleaned_data.get("lstm_units")
+			gru_units = form.cleaned_data.get("gru_units")
 			drop_rate = form.cleaned_data.get("drop_rate")
 			act_func = form.cleaned_data.get("act_func")
 			epochs = form.cleaned_data.get("epochs")
 			batch_size = form.cleaned_data.get("batch_size")
-			task = task_train_model.delay(output_dim, lstm_units, drop_rate, act_func, epochs, batch_size)
+			task = task_train_model.delay(output_dim, gru_units, drop_rate, act_func, epochs, batch_size)
 			return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 	else :
 		return HttpResponse('Request metod isnt POST')

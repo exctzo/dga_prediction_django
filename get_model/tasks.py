@@ -14,7 +14,7 @@ import numpy as np
 
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, LSTM
+from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, GRU
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from tensorflow.keras.callbacks import EarlyStopping
@@ -58,7 +58,7 @@ def task_get_data():
 
 
 @task(name="train_model")
-def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_size):
+def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_size):
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading training data...'})
     # Подгрузка данных о доменных именах с диска.
@@ -104,7 +104,7 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
     # Построение модели.
     model = Sequential()
     model.add(Embedding(max_features, output_dim, input_length=maxlen))
-    model.add(LSTM(lstm_units))
+    model.add(GRU(gru_units))
     model.add(Dropout(rate=drop_rate))
     model.add(Dense(1))
     model.add(Activation(act_func))
@@ -113,7 +113,7 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
     # Построение модели.
     model_dga = Sequential()
     model_dga.add(Embedding(max_features, output_dim, input_length=maxlen))
-    model_dga.add(LSTM(lstm_units))
+    model_dga.add(GRU(gru_units))
     model_dga.add(Dropout(rate=drop_rate))
     model_dga.add(Dense(classes))
     model_dga.add(Activation(act_func))
