@@ -1,7 +1,8 @@
 import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth.decorators import login_required, staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from .tasks import *
 from . import forms
 from celery.result import AsyncResult
