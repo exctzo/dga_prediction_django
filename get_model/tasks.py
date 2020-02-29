@@ -101,7 +101,7 @@ def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_s
     X_dga = sequence.pad_sequences(X_dga, maxlen=maxlen)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0, random_state=0)
+    # X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0.2, random_state=0)
 
     # Построение модели.
     model = Sequential()
@@ -145,7 +145,7 @@ def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_s
     current_task.update_state(state='PROGRESS', meta={'step' : 'training family prediction model...'})
 
     # Обучение модели.
-    model_dga.fit(X_dga_train, y_dga_train, epochs=epochs, batch_size=batch_size)
+    model_dga.fit(X_dga, y_dga, epochs=epochs, batch_size=batch_size)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
