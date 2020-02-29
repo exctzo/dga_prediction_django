@@ -67,7 +67,7 @@ def task_train_model(output_dim, lstm_units, drop_rate, act_func, epochs, batch_
 
     # Общая коллекция данных.
     all_data_dict = pd.concat([training_data['legit'][:100000], training_data['dga'][:100000]], ignore_index=False, sort=True)
-    dga_data_dict = pd.concat([training_data['dga'][:5000]], ignore_index=True)
+    dga_data_dict = pd.concat([training_data['dga'][:100000]], ignore_index=True)
     
     # Равномерное распределение по семьям
     dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(10000, replace=True))
