@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from . import views as manual_views
-from .views import Dashboard
+# from .views import Dashboard
 
 urlpatterns = [
     path('', manual_views.sniff),
