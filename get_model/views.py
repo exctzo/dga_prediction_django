@@ -1,14 +1,14 @@
 import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, staff_member_required
 from .tasks import *
 from . import forms
 from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from celery import current_task
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def get_task_info(request):
 	task_id = request.GET.get('task_id', None)
 	if task_id is not None:
@@ -25,7 +25,7 @@ def get_task_info(request):
 	else:
 		return HttpResponse('No job id given.')
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def revoke_task(request):
 	# task_id = current_task.request.id
 	i = inspect()
@@ -33,13 +33,13 @@ def revoke_task(request):
 	task_id = list(active_tasks.values())[0][0]["id"]
 	revoke(task_id, terminate=True)
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def get_model(request) :
 	return render(request, 'get_model.html', {
 		'get_data_form': forms.GetDataForm(),
 		'train_form': forms.TrainForm(),})
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def get_data(request) :
 	if request.method == 'POST' :
 		form = forms.GetDataForm(request.POST)
@@ -48,7 +48,7 @@ def get_data(request) :
 	else:
 		return HttpResponse('Request metod isnt POST')
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def train_model(request) :
 	if request.method == 'POST' :
 		form = forms.TrainForm(request.POST)

@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, staff_member_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import TemplateView
 from .tasks import *
@@ -11,7 +11,7 @@ from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from django.db.models import Count
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def get_task_info(request):
 	task_id = request.GET.get('task_id', None)
 	if task_id is not None:
@@ -28,14 +28,14 @@ def get_task_info(request):
 	else:
 		return HttpResponse('No job id given.')
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def revoke_task(request):
 	i = inspect()
 	active_tasks = i.active()
 	task_id = list(active_tasks.values())[0][0]["id"]
 	revoke(task_id, terminate=True)
 
-@login_required(login_url='/login/')
+@staff_member_required(login_url='/login/')
 def sniff(iv_request) :
 	if iv_request.method == 'POST' :
 		lv_form = forms.SniffForm(iv_request.POST)
@@ -80,7 +80,6 @@ def statsbyhost(request, pk):
 
 class Dashboard(TemplateView):
 	template_name = 'dash.html'
-	@login_required(login_url='/login/')
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
 		context['dga_lineplot'] = plots.dga_lineplot()
