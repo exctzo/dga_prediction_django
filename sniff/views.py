@@ -10,6 +10,7 @@ from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from django.db.models import Count
 
+@login_required(login_url='/login/')
 def get_task_info(request):
 	task_id = request.GET.get('task_id', None)
 	if task_id is not None:
@@ -26,12 +27,14 @@ def get_task_info(request):
 	else:
 		return HttpResponse('No job id given.')
 
+@login_required(login_url='/login/')
 def revoke_task(request):
 	i = inspect()
 	active_tasks = i.active()
 	task_id = list(active_tasks.values())[0][0]["id"]
 	revoke(task_id, terminate=True)
 
+@login_required(login_url='/login/')
 def sniff(iv_request) :
 	if iv_request.method == 'POST' :
 		lv_form = forms.SniffForm(iv_request.POST)
@@ -51,6 +54,7 @@ def sniff(iv_request) :
 		lv_form = forms.SniffForm()
 	return render(iv_request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
 
+@login_required(login_url='/login/')
 def statistic(request) :
 	if request.user.is_superuser:
 		#hosts_list = models.Hosts.objects.order_by("-requests_count")
@@ -63,6 +67,7 @@ def statistic(request) :
 
 	return render(request, 'statistic.html', {'hosts_list':hosts_list, 'requests_list':requests_list})
 
+@login_required(login_url='/login/')
 def statsbyhost(request, pk):
 	requested_host = pk
 	#requested_host_details = models.Hosts.objects.get(ip=requested_host)
