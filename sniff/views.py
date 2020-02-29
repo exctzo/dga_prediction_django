@@ -12,6 +12,12 @@ from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from django.db.models import Count
 
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.views.decorators.cache import cache_page
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
 @staff_member_required(login_url='/login/')
 def get_task_info(request):
 	task_id = request.GET.get('task_id', None)
@@ -79,11 +85,16 @@ def statsbyhost(request, pk):
 	
 	return render(request, 'host.html', {'host':requested_host,'count_requests':count_requests,'count_dga_requests':count_dga_requests, 'requests':requests_by_host})
 
-class Dashboard(TemplateView):
-	template_name = 'dash.html'
-	def get_context_data(self, **kwargs):
-		context = super(Dashboard, self).get_context_data(**kwargs)
-		context['dga_lineplot'] = plots.dga_lineplot()
-		context['hosts_piechart'] = plots.hosts_piechart()
-		context['families_piechart'] = plots.families_piechart()
-		return context
+
+@cache_page(CACHE_TTL)
+def dashboard(request):
+	return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
+
+# class Dashboard(TemplateView):
+# 	template_name = 'dash.html'
+# 	def get_context_data(self, **kwargs):
+# 		context = super(Dashboard, self).get_context_data(**kwargs)
+# 		context['dga_lineplot'] = plots.dga_lineplot()
+# 		context['hosts_piechart'] = plots.hosts_piechart()
+# 		context['families_piechart'] = plots.families_piechart()
+# 		return context

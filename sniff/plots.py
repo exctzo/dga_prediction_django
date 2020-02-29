@@ -6,13 +6,6 @@ import requests
 from . import models
 from django.db.models import Count
 
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.views.decorators.cache import cache_page
-
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-
-@cache_page(CACHE_TTL)
 def dga_lineplot():
 
     dga = models.Requests.objects.filter(dga=1).values('report_date').annotate(count=Count('report_date')).order_by("report_date")
@@ -37,7 +30,7 @@ def dga_lineplot():
 
     return plot_div
 
-@cache_page(CACHE_TTL)
+
 def hosts_piechart():
 
     #labels = [i[0] for i in models.Hosts.objects.values_list('ip')]
@@ -55,7 +48,7 @@ def hosts_piechart():
     plot_div = plot(fig, output_type='div',filename='donut')
     return plot_div
 
-@cache_page(CACHE_TTL)
+
 def families_piechart():
 
     #labels = [i[0] for i in models.Hosts.objects.values_list('ip')]
