@@ -42,14 +42,14 @@ def task_get_data():
     domain_list = pd.read_csv('get_model/input_data/top-1m.csv', names=['domain'])
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
     domain_list['type'] = 0
-    training_data['legit'] = domain_list[:100000]
+    training_data['legit'] = domain_list.sample(100000)
 
     domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
     domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
     domain_list['type'] = 1
     domain_list['subtype'] = pd.factorize(domain_list.family)[0]
-    training_data['dga'] = random.sample(domain_list, 100000)
+    training_data['dga'] = domain_list.sample(100000)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
     with open('get_model/input_data/training_data.pkl', 'wb') as f:
