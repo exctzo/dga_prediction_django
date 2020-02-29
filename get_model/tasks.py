@@ -47,9 +47,10 @@ def task_get_data():
     domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
     domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
+    domain_list = domain_list.sample(100000)
     domain_list['type'] = 1
     domain_list['subtype'] = pd.factorize(domain_list.family)[0]
-    training_data['dga'] = domain_list.sample(100000)
+    training_data['dga'] = domain_list
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
     with open('get_model/input_data/training_data.pkl', 'wb') as f:
@@ -100,7 +101,7 @@ def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_s
     X_dga = sequence.pad_sequences(X_dga, maxlen=maxlen)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0.2, random_state=0)
+    X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0, random_state=0)
 
     # Построение модели.
     model = Sequential()
