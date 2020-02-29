@@ -78,9 +78,9 @@ def statsbyhost(request, pk):
 	
 	return render(request, 'host.html', {'host':requested_host,'count_requests':count_requests,'count_dga_requests':count_dga_requests, 'requests':requests_by_host})
 
-@login_required(login_url='/login/')
 class Dashboard(TemplateView):
 	template_name = 'dash.html'
+	@login_required(login_url='/login/')
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
 		context['dga_lineplot'] = plots.dga_lineplot()
