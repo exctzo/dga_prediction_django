@@ -47,7 +47,7 @@ def task_get_data():
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
     domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
     domain_list['type'] = 1
-    domain_list['subtype'] = pd.factorize(domain_list.family)[0]s 
+    domain_list['subtype'] = pd.factorize(domain_list.family)[0]
     training_data['dga'] = domain_list
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
