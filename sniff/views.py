@@ -85,16 +85,7 @@ def statsbyhost(request, pk):
 	
 	return render(request, 'host.html', {'host':requested_host,'count_requests':count_requests,'count_dga_requests':count_dga_requests, 'requests':requests_by_host})
 
-
+@login_required(login_url='/login/')
 @cache_page(CACHE_TTL)
 def dashboard(request):
 	return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
-
-# class Dashboard(TemplateView):
-# 	template_name = 'dash.html'
-# 	def get_context_data(self, **kwargs):
-# 		context = super(Dashboard, self).get_context_data(**kwargs)
-# 		context['dga_lineplot'] = plots.dga_lineplot()
-# 		context['hosts_piechart'] = plots.hosts_piechart()
-# 		context['families_piechart'] = plots.families_piechart()
-# 		return context
