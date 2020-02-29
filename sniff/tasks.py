@@ -150,13 +150,10 @@ def task_capture(iv_interface, iv_as_proxy=False, iv_dns_up_ip=None, iv_port=Non
         lv_training_data = pickle.load(f)
     lv_all_data_dict = pd.concat([lv_training_data['legit'][:100000], lv_training_data['dga'][:100000]], 
                                 ignore_index=False, sort=True)
-    #lv_dga_data_dict = pd.concat([lv_training_data['dga']], ignore_index=True)
-    gv_family_dict = {idx+1:x for idx, x in enumerate(lv_training_data['dga']['family'].unique())}
-    X = np.array(lv_all_data_dict['domain'].tolist())
-    #lv_x_dga = np.array(lv_dga_data_dict['domain'].tolist())
-    gv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
-    #lv_max_features = len(gv_valid_chars) + 1
-    gv_maxlen = np.max([len(x) for x in X])
+    gv_family_dict = {idx:x for idx, x in enumerate(lv_training_data['dga']['family'].unique())}
+    lv_x = np.array(lv_all_data_dict['domain'].tolist())
+    gv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(lv_x)))}
+    gv_maxlen = np.max([len(x) for x in lv_x])
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'warming-up models...'})
     gv_model.predict(np.array([np.zeros(gv_maxlen, dtype=int)]))
