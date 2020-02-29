@@ -4,6 +4,7 @@ from celery import current_task
 
 import os
 import pickle
+import random
 from io import BytesIO
 from urllib.request import urlopen, urlretrieve
 from zipfile import ZipFile
@@ -41,14 +42,14 @@ def task_get_data():
     domain_list = pd.read_csv('get_model/input_data/top-1m.csv', names=['domain'])
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
     domain_list['type'] = 0
-    training_data['legit'] = domain_list
+    training_data['legit'] = domain_list[:100000]
 
     domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
     domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
     domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
     domain_list['type'] = 1
     domain_list['subtype'] = pd.factorize(domain_list.family)[0]
-    training_data['dga'] = domain_list
+    training_data['dga'] = random.sample(domain_list, 100000)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
     with open('get_model/input_data/training_data.pkl', 'wb') as f:
@@ -66,11 +67,11 @@ def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_s
         training_data = pickle.load(f)
 
     # Общая коллекция данных.
-    all_data_dict = pd.concat([training_data['legit'][:100000], training_data['dga'][:100000]], ignore_index=False, sort=True)
-    dga_data_dict = pd.concat([training_data['dga'][:100000]], ignore_index=True)
+    all_data_dict = pd.concat([training_data['legit'], training_data['dga']], ignore_index=False, sort=True)
+    dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
     
     # Равномерное распределение по семьям
-    dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(10000, replace=True))
+    dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(5000, replace=True))
 
     # Словарь с семьями DGA
     family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
