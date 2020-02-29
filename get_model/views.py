@@ -1,12 +1,14 @@
 import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.decorators import login_required
 from .tasks import *
 from . import forms
 from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from celery import current_task
 
+@login_required(login_url='/login/')
 def get_task_info(request):
 	task_id = request.GET.get('task_id', None)
 	if task_id is not None:
@@ -23,7 +25,7 @@ def get_task_info(request):
 	else:
 		return HttpResponse('No job id given.')
 
-
+@login_required(login_url='/login/')
 def revoke_task(request):
 	# task_id = current_task.request.id
 	i = inspect()
@@ -31,27 +33,13 @@ def revoke_task(request):
 	task_id = list(active_tasks.values())[0][0]["id"]
 	revoke(task_id, terminate=True)
 
-
-	# if task_id is not None:
-	# 	task = AsyncResult(task_id)
-	# 	if task.state == 'PROGRESS':
-	# 		revoke(task_id, terminate=True)
-	# 		task = AsyncResult(task_id)
-	# 		data = {
-	# 			'state': task.state,
-	# 			'result': task.result,
-	# 		}
-	# return HttpResponse(json.dumps(active_tasks), content_type='application/json')
-		# else:
-		# 	return HttpResponse('Task isnt processing.')
-	# else:
-	# 	return HttpResponse('No job id given.')
-
+@login_required(login_url='/login/')
 def get_model(request) :
 	return render(request, 'get_model.html', {
 		'get_data_form': forms.GetDataForm(),
 		'train_form': forms.TrainForm(),})
 
+@login_required(login_url='/login/')
 def get_data(request) :
 	if request.method == 'POST' :
 		form = forms.GetDataForm(request.POST)
@@ -60,8 +48,7 @@ def get_data(request) :
 	else:
 		return HttpResponse('Request metod isnt POST')
 
-# if not os.path.isfile('get_model/input_data/training_data.pkl'):
-
+@login_required(login_url='/login/')
 def train_model(request) :
 	if request.method == 'POST' :
 		form = forms.TrainForm(request.POST)

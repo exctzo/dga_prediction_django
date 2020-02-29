@@ -8,16 +8,13 @@ from django.contrib import messages
 from . import forms
 from . import models
 
-# Create your views here.
-
-def home(request) :
+def home(request):
 	return render(request, 'home.html')
 
-def redirect(request) :
+def redirect(request):
 	return HttpResponseRedirect("login/")
 
-def register(request) :
-
+def register(request):
 	if request.user.is_authenticated :
 		return HttpResponseRedirect("/")
 
@@ -41,12 +38,13 @@ def register(request) :
 				return HttpResponseRedirect('/')
 	else :
 		form = forms.RegisterForm()
-	
 	return render(request, 'registration/register.html', {'form':form})
 
+@login_required(login_url='/login/')
 def profile(request) :
 	return render(request, 'profile/profile.html')
 
+@login_required(login_url='/login/')
 def update_password(request) :
 	if request.method == 'POST' :
 		form = PasswordChangeForm(request.user, request.POST)
@@ -59,5 +57,4 @@ def update_password(request) :
 			messages.error(request, 'Please correct the error below.')
 	else :
 		form = PasswordChangeForm(request.user)
-	
 	return render(request, 'profile/change-password.html',{'form':form})
