@@ -25,19 +25,19 @@
 		<div class="requests">
 			<table>
 				<tr>
-					<th>IP source</th>
 					<th>IP destination</th>
 					<th>Domain name</th>
 					<th>Report date</th>
-					<th>DGA</th>
+					<th>Is DGA?</th>
+					<th>DGA Family</th>
 				</tr>
 				{% for request in requests %}
 					<tr>
-						<td>{{ request.ip_src }}</td>
 						<td>{{ request.ip_dst }}</td>
 						<td>{{ request.qname }}</td>
 						<td>{{ request.report_date }}</td>
 						<td>{{ request.dga }}</td>
+						<td>{{ request.dga_subtype }}</td>
 					</tr>
 				{% endfor %}
 			</table>

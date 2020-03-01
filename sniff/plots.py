@@ -8,11 +8,11 @@ from django.db.models import Count
 
 def dga_lineplot():
 
-    dga = models.Requests.objects.filter(dga=1).values('report_date').annotate(count=Count('report_date')).order_by("report_date")
-    non_dga = models.Requests.objects.filter(dga=0).values('report_date').annotate(count=Count('report_date')).order_by("report_date")
+    dga = models.Requests.objects.filter(dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+    non_dga = models.Requests.objects.filter(dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
 
-    dga_dates = [i['report_date'] for i in dga]
-    non_dga_dates = [i['report_date'] for i in non_dga]
+    dga_dates = [i['trunced_date'] for i in dga]
+    non_dga_dates = [i['trunced_date'] for i in non_dga]
     dga_requests_counts = [i['count'] for i in dga]
     non_dga_requests_counts = [i['count'] for i in non_dga]
 
