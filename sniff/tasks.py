@@ -43,42 +43,40 @@ def logger_setup():
 def checker(iv_qname, iv_ip_src, iv_ip_dst):
     gv_pre_domain = None
     lv_ext_qname = tldextract.extract(iv_qname)
-    # Отсеивание с длиной < 6 и != предыдущему запросу.
-    if len(lv_ext_qname.domain) > 6 and lv_ext_qname.domain != gv_pre_domain:
-        # Преобразование домена в последовательность int с одиннаковой длиной.
-        lv_seq = list(lv_ext_qname.domain)
-        lv_x_pred = [gv_valid_chars[y] for y in lv_seq]
-        lv_x_pred = sequence.pad_sequences([lv_x_pred], maxlen=gv_maxlen)
-        gv_pre_domain = lv_ext_qname.domain
-        # Предсказание типа доменного имени.
+    # Преобразование домена в последовательность int с одиннаковой длиной.
+    lv_seq = list(lv_ext_qname.domain)
+    lv_x_pred = [gv_valid_chars[y] for y in lv_seq]
+    lv_x_pred = sequence.pad_sequences([lv_x_pred], maxlen=gv_maxlen)
+    gv_pre_domain = lv_ext_qname.domain
+    # Предсказание типа доменного имени.
+    with gv_session.as_default():
+        with gv_graph.as_default():
+            lv_pred_class = gv_model.predict_classes(lv_x_pred)[0][0]
+            lv_pred_proba = gv_model.predict_classes(lv_x_pred)[0][0]
+
+    if lv_pred_class == 0:
+        lv_n_class = 'Legit'
+    else:
+        lv_n_class = 'DGA'
+
+    # current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + lv_n_class + ', Route: ' + iv_ip_src + ' --> ' + iv_ip_dst + ', QNAME: ' + iv_qname})
+
+    lv_pred_family = None
+    lv_pred_family_prob = None
+
+    if lv_pred_class == 1:
+        # Предсказание подтипа DGA доменного имени.
         with gv_session.as_default():
             with gv_graph.as_default():
-                lv_pred_class = gv_model.predict_classes(lv_x_pred)[0][0]
-                lv_pred_proba = gv_model.predict_classes(lv_x_pred)[0][0]
-
-        if lv_pred_class == 0:
-            lv_n_class = 'Legit'
-        else:
-            lv_n_class = 'DGA'
-
-        # current_task.update_state(state='PROGRESS', meta={'step' : 'Domain class: ' + lv_n_class + ', Route: ' + iv_ip_src + ' --> ' + iv_ip_dst + ', QNAME: ' + iv_qname})
-
-        lv_pred_family = None
-        lv_pred_family_prob = None
-
-        if lv_pred_class == 1:
-            # Предсказание подтипа DGA доменного имени.
-            with gv_session.as_default():
-                with gv_graph.as_default():
-                    lv_pred_subclass = gv_model_dga.predict_classes(lv_x_pred)
-                    lv_pred_subproba = gv_model_dga.predict_proba(lv_x_pred)
-                    lv_pred_family = gv_family_dict[lv_pred_subclass[0]]
-                    lv_pred_family_prob = lv_pred_subproba[0][lv_pred_subclass[0]]
-            # Сохранение в логах
-            gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
-        # Сохранение в базе
-        lv_req = models.Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob)
-        lv_req.save()
+                lv_pred_subclass = gv_model_dga.predict_classes(lv_x_pred)
+                lv_pred_subproba = gv_model_dga.predict_proba(lv_x_pred)
+                lv_pred_family = gv_family_dict[lv_pred_subclass[0]]
+                lv_pred_family_prob = lv_pred_subproba[0][lv_pred_subclass[0]]
+        # Сохранение в логах
+        gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
+    # Сохранение в базе
+    lv_req = models.Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob)
+    lv_req.save()
 
 
 def packet_callback(iv_packet):

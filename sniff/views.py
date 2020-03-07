@@ -59,8 +59,15 @@ def sniff(iv_request) :
 
 			return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else :
+		# lv_i = inspect()
+		# lv_active_tasks = lv_i.active()
+		# try:
+		# 	lv_task_id = list(lv_active_tasks.values())[0][0]["id"]
+		# 	# return HttpResponse(json.dumps({'task_id': lv_task_id}), content_type='application/json')
+		# 	return render(iv_request, 'sniff2.html', {'sniff2_form': lv_form, 'task_id':lv_task_id})
+		# except Exception:
 		lv_form = forms.SniffForm()
-	return render(iv_request, 'sniff.html', {'sniff_form': forms.SniffForm, 'head':'Setting parameters for sniffing:'})
+		return render(iv_request, 'sniff.html', {'sniff_form': lv_form, 'head':'Setting parameters for sniffing:'})
 
 @login_required(login_url='/login/')
 def statistic(request) :
