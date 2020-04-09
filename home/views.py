@@ -24,15 +24,14 @@ def register(request):
 			form.save()
 			username = form.cleaned_data.get("username")
 			email = form.cleaned_data.get("email")
-			first_name = form.cleaned_data.get("first_name") # its local_dns_ip
+			local_dns_ip = form.cleaned_data.get("local_dns_ip")
 			password = form.cleaned_data.get("password")
 			try :
 				user = User.objects.get(username=uservalue)
 				error = {'form':form, 'error':'User name already taken'}
 				return render(request, 'registration/register.html', error)
 			except :
-				# need to change user model to set rigth attribute (local dns ip)
-				user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name) 
+				user = User.objects.create_user(username=username, password=password, email=email, local_dns_ip=local_dns_ip) 
 				user.save()
 				login(request, user)
 				return HttpResponseRedirect('/')

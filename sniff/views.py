@@ -75,7 +75,7 @@ def statistic(request) :
 		#hosts_list = models.Hosts.objects.order_by("-requests_count")
 		hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
-		local_dns_ip = request.user.first_name
+		local_dns_ip = request.user.local_dns_ip
 		#hosts_list = models.Hosts.objects.filter(ip=local_dns_ip).order_by("-requests_count")
 		hosts_list = models.Requests.objects.filter(ip_src=local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	requests_list = models.Requests.objects.order_by("report_date")
