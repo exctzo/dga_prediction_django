@@ -111,13 +111,13 @@ class GetDataModelTest(TestCase):
         model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
 
         # Обучение модели 1.
-        model.fit(X_train, y_train, epochs=1, batch_size=128)
+        model.fit(X_train, y_train, epochs=1, batch_size=128, verbose=0)
 
         # Сохранение модели на диск.
         model.save('get_model/input_data/test/dga_prediction_model.h5')
 
         # Обучение модели.
-        model_dga.fit(X_dga, y_dga, epochs=1, batch_size=128)
+        model_dga.fit(X_dga, y_dga, epochs=1, batch_size=128, verbose=0)
 
         # Сохранение модели на диск.
         model_dga.save('get_model/input_data/test/family_prediction_model.h5')
