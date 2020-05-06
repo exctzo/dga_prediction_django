@@ -64,7 +64,7 @@ class GetDataModelTest(TestCase):
         dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
         
         # Равномерное распределение по семьям
-        dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(500, replace=True))
+        dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(100, replace=True))
 
         # Словарь с семьями DGA
         family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
