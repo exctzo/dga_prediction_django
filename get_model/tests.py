@@ -88,7 +88,7 @@ class GetDataModelTest(TestCase):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-        tf.logging.set_verbosity(tf.logging.ERROR)
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
         # Построение модели.
         model = Sequential()
