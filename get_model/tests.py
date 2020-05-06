@@ -1,14 +1,8 @@
 from django.test import TestCase
-
 import shutil
 
-
 class GetModelTest(TestCase):
-    def setUp(self):
-        #self.req = Requests.objects.create(ip_dst='68.183.21.239', ip_src='243.19.14.144', qname='ajsfhkjshf.com', dga='1', dga_proba='0.7', dga_subtype='fwefsd', dga_subtype_proba = '0.3')
-
     def test_prepare_data(self):
-
     # Загрузка Cisco Umbrella Popularity List (legit).
     resp = urlopen('http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip')
     zipfile = ZipFile(BytesIO(resp.read()))
