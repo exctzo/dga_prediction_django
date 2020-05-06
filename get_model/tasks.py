@@ -2,10 +2,12 @@ from __future__ import absolute_import, unicode_literals
 from celery.decorators import task
 from celery import current_task
 
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+
 import os
 import pickle
 import random
-import warnings
 from io import BytesIO
 from urllib.request import urlopen, urlretrieve
 from zipfile import ZipFile
@@ -20,8 +22,6 @@ from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, GRU
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from tensorflow.keras.callbacks import EarlyStopping
-
-warnings.filterwarnings('ignore')
 
 
 @task(name="get_data")

@@ -3,11 +3,13 @@ from celery.decorators import task
 from celery import current_task
 from . import models
 
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+
 import sys
 import iptc
 import pickle
 import socket
-import warnings
 import logging
 import datetime
 import tldextract
@@ -29,7 +31,6 @@ from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras import backend as K
 
-warnings.filterwarnings('ignore')
 
 def logger_setup():
     lv_directory = os.path.dirname('sniff/logs/')
