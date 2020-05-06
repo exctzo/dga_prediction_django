@@ -121,8 +121,6 @@ class GetDataModelTest(TestCase):
         # Обучение модели.
         model_dga.fit(X_dga, y_dga, epochs=1, batch_size=128)
 
-        current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
-
         # Сохранение модели на диск.
         model_dga.save('get_model/input_data/test/family_prediction_model.h5')
 
