@@ -1,6 +1,27 @@
 from django.test import TestCase
 
+
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+
 import shutil
+import os
+import pickle
+import random
+from io import BytesIO
+from urllib.request import urlopen, urlretrieve
+from zipfile import ZipFile
+import pandas as pd
+
+import math
+import numpy as np
+
+from tensorflow.keras.preprocessing import sequence
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, GRU
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+from tensorflow.keras.callbacks import EarlyStopping
 
 
 class GetModelTest(TestCase):
