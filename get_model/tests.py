@@ -35,7 +35,7 @@ class GetModelTest(TestCase):
         zipfile.extractall("get_model/input_data/test")
         
         # Загрузка Malware Domain by John Bambenek of Bambenek Consulting (dga).
-        urlretrieve('http://osint.bambenekconsulting.com/feeds/dga-feed.txt', 'get_model/input_data/dga.csv')
+        urlretrieve('http://osint.bambenekconsulting.com/feeds/dga-feed.txt', 'get_model/input_data/test/dga.csv')
 
         training_data = {'legit': [], 'dga': []}
 
