@@ -1,5 +1,8 @@
 from django.test import TestCase
 
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+
 import os
 import pickle
 import random
