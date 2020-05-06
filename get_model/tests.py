@@ -40,12 +40,12 @@ class GetModelTest(TestCase):
         training_data = {'legit': [], 'dga': []}
 
         # Выделение второго уровная доменного имени.
-        domain_list = pd.read_csv('get_model/input_data/top-1m.csv', names=['domain'])
+        domain_list = pd.read_csv('get_model/input_data/test/top-1m.csv', names=['domain'])
         domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
         domain_list['type'] = 0
         training_data['legit'] = domain_list.sample(1000)
 
-        domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
+        domain_list = pd.read_csv('get_model/input_data/test/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
         domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
         domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
         domain_list = domain_list.sample(1000)
