@@ -1,8 +1,14 @@
 from django.test import TestCase
+
 import shutil
 
+
 class GetModelTest(TestCase):
+    def setUp(self):
+        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
+
     def test_prepare_data(self):
+
     # Загрузка Cisco Umbrella Popularity List (legit).
     resp = urlopen('http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip')
     zipfile = ZipFile(BytesIO(resp.read()))
@@ -29,7 +35,3 @@ class GetModelTest(TestCase):
 
     with open('get_model/input_data/test/training_data.pkl', 'wb') as f:
         pickle.dump(training_data, f, pickle.HIGHEST_PROTOCOL)
-
-
-    def del_test_data(self):
-        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
