@@ -4,6 +4,8 @@ import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+
 import pickle
 import random
 from io import BytesIO
@@ -91,7 +93,6 @@ class GetDataModelTest(TestCase):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-        tf.autograph.set_verbosity(0)
         tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
         # Построение модели.
