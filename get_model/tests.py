@@ -25,8 +25,6 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 
 class GetDataModelTest(TestCase):
-    def setUp(self):
-        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
 
     def test_prepare_data(self):
         # Загрузка Cisco Umbrella Popularity List (legit).
@@ -126,4 +124,7 @@ class GetDataModelTest(TestCase):
         current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
         # Сохранение модели на диск.
-        model_dga.save('get_model/input_data/family_prediction_model.h5')
+        model_dga.save('get_model/input_data/test/family_prediction_model.h5')
+
+    def delete_test_data
+        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
