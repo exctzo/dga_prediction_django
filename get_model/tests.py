@@ -1,10 +1,8 @@
 from django.test import TestCase
 
-
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore',category=Warning)
 
-import shutil
 import os
 import pickle
 import random
@@ -123,6 +121,3 @@ class GetDataModelTest(TestCase):
 
         # Сохранение модели на диск.
         model_dga.save('get_model/input_data/test/family_prediction_model.h5')
-
-    def delete_test_data():
-        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
