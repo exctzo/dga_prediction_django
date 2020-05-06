@@ -20,11 +20,11 @@ class UsersTest(TestCase):
         # Get correct status code
         self.assertEqual(response.status_code, 200)
 
-    def test_admin_exist(self):
+    def test_user_exist(self):
         # Create an instance of a GET request.
         request = self.factory.get('/profile')
 
-        user = User.objects.get(username='admin')
+        user = User.objects.get(username='test_user')
 
         # Simulate a logged-in user by setting request.user manually.
         request.user = self.user
