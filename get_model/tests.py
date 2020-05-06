@@ -126,5 +126,5 @@ class GetDataModelTest(TestCase):
         # Сохранение модели на диск.
         model_dga.save('get_model/input_data/test/family_prediction_model.h5')
 
-    def delete_test_data
+    def delete_test_data()
         shutil.rmtree('get_model/input_data/test', ignore_errors=True)
