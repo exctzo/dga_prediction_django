@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class UsersTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='test_user', password='test_pass', email='test@mail.ru', local_dns_ip='101.10.10.101')
+        self.user = User.objects.create_user(username='test_user', password='test_pass', email='test@mail.ru', first_name='101.10.10.101')
 
     def test_user_profile(self):
         # Create an instance of a GET request.

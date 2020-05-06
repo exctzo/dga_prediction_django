@@ -31,7 +31,7 @@ def register(request):
 				error = {'form':form, 'error':'User name already taken'}
 				return render(request, 'registration/register.html', error)
 			except :
-				user = User.objects.create_user(username=username, password=password, email=email, local_dns_ip=local_dns_ip) 
+				user = User.objects.create_user(username=username, password=password, email=email, first_name=local_dns_ip) 
 				user.save()
 				login(request, user)
 				return HttpResponseRedirect('/')
