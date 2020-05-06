@@ -1,8 +1,5 @@
 from django.test import TestCase
 
-import warnings
-warnings.filterwarnings('ignore',category=Warning)
-
 import os
 import pickle
 import random
@@ -13,13 +10,12 @@ import pandas as pd
 
 import math
 import numpy as np
+import tensorflow as tf
 
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, GRU
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
-from tensorflow.keras.callbacks import EarlyStopping
 
 
 class GetDataModelTest(TestCase):
@@ -91,6 +87,8 @@ class GetDataModelTest(TestCase):
         X_dga = sequence.pad_sequences(X_dga, maxlen=maxlen)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+        tf.logging.set_verbosity(tf.logging.ERROR)
 
         # Построение модели.
         model = Sequential()
