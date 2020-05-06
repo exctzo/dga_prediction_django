@@ -8,29 +8,29 @@ class UsersTest(TestCase):
         self.user = User.objects.create_user(username='test_user', password='test_pass', email='test@mail.ru', first_name='101.10.10.101')
 
     def test_user_profile(self):
-        # Create an instance of a GET request.
+        # Создание экземпляра GET запроса.
         request = self.factory.get('/profile')
 
-        # Simulate a logged-in user by setting request.user manually.
+        # Симуляция входа пользователя через настройку request.user вручную.
         request.user = self.user
 
-        # Test profile() view
+        # Тестирование profile() представления.
         response = profile(request)
 
-        # Get correct status code
+        # Проверка корректности кода ответа.
         self.assertEqual(response.status_code, 200)
 
     def test_user_exist(self):
-        # Create an instance of a GET request.
+        # Создание экземпляра GET запроса.
         request = self.factory.get('/profile')
 
         user = User.objects.get(username='test_user')
 
-        # Simulate a logged-in user by setting request.user manually.
+        # Симуляция входа пользователя через настройку request.user вручную.
         request.user = self.user
 
-        # Test profile() view
+        # Тестирование profile() представления.
         response = profile(request)
 
-        # Get correct status code
+        # Проверка корректности кода ответа.
         self.assertEqual(response.status_code, 200)

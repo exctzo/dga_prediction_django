@@ -8,8 +8,8 @@ class SniffTestCase(TestCase):
 
     def test_requests_models(self):
 
-        # Get qname by ip_src
+        # Получение запроса через ip_src
         req = Requests.objects.get(ip_src='243.19.14.144')
 
-        # Get correct qname
+        # Проверка корректности полученного доменного имени
         self.assertEqual(req.qname,'ajsfhkjshf.com')
