@@ -122,5 +122,12 @@ class GetDataModelTest(TestCase):
         # Обучение модели.
         model_dga.fit(X_dga, y_dga, epochs=1, batch_size=128, verbose=0)
 
-        # Сохранение модели на диск.
-        model_dga.save('get_model/input_data/test/family_prediction_model.h5')
+        seq = 'hchmemmrsivu'
+        X_dga_pred = [valid_chars[y] for y in seq]
+        X_dga_pred = sequence.pad_sequences([X_dga_pred], maxlen=maxlen)
+        pred_class = model_dga.predict_classes(X_dga_pred)
+        pred_proba = model_dga.predict_proba(X_dga_pred)
+                
+        # Проверка валидности классификации
+        assert pred_class is not None
+        assert pred_proba is not None
