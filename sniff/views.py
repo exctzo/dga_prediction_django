@@ -74,7 +74,7 @@ def statistic(request) :
 	if request.user.is_superuser:
 		hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
-		local_dns_ip = request.user.local_dns_ip
+		local_dns_ip = request.user.first_name
 		hosts_list = models.Requests.objects.filter(ip_src=local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	requests_list = models.Requests.objects.order_by("report_date")
 
@@ -95,4 +95,4 @@ def dashboard(request):
 	if request.user.is_superuser:
 		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
 	else:
-		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(request.user.local_dns_ip),'families_piechart':plots.families_piechart(request.user.local_dns_ip)})
+		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(request.user.first_name),'families_piechart':plots.families_piechart(request.user.first_name)})
