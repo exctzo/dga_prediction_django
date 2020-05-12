@@ -17,12 +17,7 @@
 			<p>Dashboard</p>
 	</div>
 	<div id="statistic">
-
-		
 		<div class="container text-center">
-
-		<!-- /.container -->
-
 		<div class="card" style="width: 100%;margin-top: 15px">
 		
 			<div class="card-body">
@@ -30,7 +25,6 @@
 				{{dga_lineplot|safe}}
 			</div>
 		</div>
-
 		{% if request.user.is_superuser %}
 			<div class="card" style="width: 100%;margin-top: 15px">
 			
@@ -41,22 +35,14 @@
 
 			</div>
 		{% endif %}
-
-
 		<div class="card" style="width: 100%;margin-top: 15px">
 		
 			<div class="card-body">
 				<h5 class="card-title">Spreading DGA families</h5>
 			{{families_piechart|safe}}
 			</div>
-
 		</div>
-
-
 	</div>
-
-	
-
 {% endblock %}
 
 {% block customjs %}

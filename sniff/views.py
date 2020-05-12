@@ -11,7 +11,6 @@ from . import plots
 from celery.result import AsyncResult
 from celery.task.control import revoke, inspect
 from django.db.models import Count
-
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.views.decorators.cache import cache_page
@@ -19,28 +18,28 @@ from django.views.decorators.cache import cache_page
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 @staff_member_required(login_url='/login/')
-def get_task_info(request):
-	task_id = request.GET.get('task_id', None)
-	if task_id is not None:
+def get_task_info(iv_request):
+	lv_task_id = iv_request.GET.get('task_id', None)
+	if lv_task_id is not None:
 		try:
-			task = AsyncResult(task_id)
-			data = {
-				'state': task.state,
-				'result': task.result,
+			lv_task = AsyncResult(lv_task_id)
+			lv_data = {
+				'state': lv_task.state,
+				'result': lv_task.result,
 			}
-			return HttpResponse(json.dumps(data), content_type='application/json')
+			return HttpResponse(json.dumps(lv_data), content_type='application/json')
 		except Exception:
-			data = {'state': 'REVOKED',}
-			return HttpResponse(json.dumps(data), content_type='application/json')
+			lv_data = {'state': 'REVOKED',}
+			return HttpResponse(json.dumps(lv_data), content_type='application/json')
 	else:
 		return HttpResponse('No job id given.')
 
 @staff_member_required(login_url='/login/')
-def revoke_task(request):
-	i = inspect()
-	active_tasks = i.active()
-	task_id = list(active_tasks.values())[0][0]["id"]
-	revoke(task_id, terminate=True)
+def revoke_task(iv_request):
+	lv_i = inspect()
+	lv_active_tasks = lv_i.active()
+	lv_task_id = list(lv_active_tasks.values())[0][0]["id"]
+	revoke(lv_task_id, terminate=True)
 
 @staff_member_required(login_url='/login/')
 def sniff(iv_request) :
@@ -59,6 +58,7 @@ def sniff(iv_request) :
 
 			return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else :
+		# After restart page - lose status by active processes
 		# lv_i = inspect()
 		# lv_active_tasks = lv_i.active()
 		# try:
@@ -70,29 +70,29 @@ def sniff(iv_request) :
 		return render(iv_request, 'sniff.html', {'sniff_form': lv_form, 'head':'Setting parameters for sniffing:'})
 
 @login_required(login_url='/login/')
-def statistic(request) :
-	if request.user.is_superuser:
-		hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
+def statistic(iv_request) :
+	if iv_request.user.is_superuser:
+		lv_hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
-		local_dns_ip = request.user.first_name
-		hosts_list = models.Requests.objects.filter(ip_src=local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
-	requests_list = models.Requests.objects.order_by("report_date")
+		lv_local_dns_ip = iv_request.user.first_name
+		lv_hosts_list = models.Requests.objects.filter(ip_src=lv_local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
+	lv_requests_list = models.Requests.objects.order_by("report_date")
 
-	return render(request, 'statistic.html', {'hosts_list':hosts_list, 'requests_list':requests_list})
+	return render(iv_request, 'statistic.html', {'hosts_list':lv_hosts_list, 'requests_list':lv_requests_list})
 
 @login_required(login_url='/login/')
-def statsbyhost(request, pk):
-	requested_host = pk
-	count_requests = models.Requests.objects.filter(ip_src=requested_host).annotate(count=Count('ip_src'))
-	count_dga_requests = models.Requests.objects.filter(ip_src=requested_host,dga=1).annotate(count=Count('ip_src'))
-	requests_by_host = models.Requests.objects.filter(ip_src=requested_host)
+def statsbyhost(iv_request, iv_pk):
+	lv_requested_host = iv_pk
+	lv_count_requests = models.Requests.objects.filter(ip_src=lv_requested_host).annotate(count=Count('ip_src'))
+	lv_count_dga_requests = models.Requests.objects.filter(ip_src=lv_requested_host,dga=1).annotate(count=Count('ip_src'))
+	lv_requests_by_host = models.Requests.objects.filter(ip_src=lv_requested_host)
 	
-	return render(request, 'host.html', {'host':requested_host,'count_requests':count_requests,'count_dga_requests':count_dga_requests, 'requests':requests_by_host})
+	return render(iv_request, 'host.html', {'host':lv_requested_host,'count_requests':lv_count_requests,'count_dga_requests':lv_count_dga_requests, 'requests':lv_requests_by_host})
 
 @login_required(login_url='/login/')
 @cache_page(CACHE_TTL)
-def dashboard(request):
-	if request.user.is_superuser:
-		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
+def dashboard(iv_request):
+	if iv_request.user.is_superuser:
+		return render(iv_request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
 	else:
-		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(request.user.first_name),'families_piechart':plots.families_piechart(request.user.first_name)})
+		return render(iv_request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(iv_request.user.first_name),'families_piechart':plots.families_piechart(iv_request.user.first_name)})

@@ -17,17 +17,13 @@ import numpy as np
 import pandas as pd
 import netifaces as ni
 import tensorflow as tf
-
 from threading import Thread
 from scapy.all import *
 from scapy.layers.dns import DNS
 from scapy.layers.inet import IP
-
 from tensorflow.keras.models import load_model
-
 from tensorflow.keras.utils import CustomObjectScope
 from tensorflow.keras.initializers import glorot_uniform
-
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras import backend as K
 

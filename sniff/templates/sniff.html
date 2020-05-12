@@ -11,11 +11,9 @@
 {% endblock %}
 
 {% block custombody %}
-
 	<div id="pageHeading">
 			<p>Sniffing</p>
 	</div>
-
 	<div id="sniff">
 		<form id="sniffForm" action="/sniff/" method="post" >
 			{% csrf_token %}
@@ -33,9 +31,6 @@
 			</div>
 			<button type="submit" name="submit" class="submitButton">Process capture</button>
 		</form>
-
-
-
 		<form style="display:none;" action="/sniff/revoke_task/" id="revokeTaskForm" method="post" >
 			{% csrf_token %}
 			<button type="submit" name="submit" class="submitButton">Cancel</button>

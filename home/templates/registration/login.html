@@ -11,16 +11,13 @@
 {% endblock %}
 
 {% block custombody %}
-
 	<div id="pageHeading">
 		<p>Login</p>
 	</div>
-
 	<div id="register">
 		<div class="registerForm">
 			<form method="post">
 				{% csrf_token %}
-	
 				{% for field in form %}
 					<div>
 						<label>{{ field.label }}</label>
@@ -28,11 +25,9 @@
 						{{ field.errors }}
 					</div>
 				{% endfor %}
-	
 				<button type="submit" name="submit" class="submitButton">Login</button>
 				<p class="message">Not registered? <a href="../register">Create an accont</a></p>
 			</form>
 		</div>
 	</div>
-
 {% endblock %}

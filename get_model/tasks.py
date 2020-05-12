@@ -8,14 +8,12 @@ warnings.filterwarnings('ignore',category=FutureWarning)
 import os
 import pickle
 import random
+import pandas as pd
+import math
+import numpy as np
 from io import BytesIO
 from urllib.request import urlopen, urlretrieve
 from zipfile import ZipFile
-import pandas as pd
-
-import math
-import numpy as np
-
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding, GRU
@@ -26,132 +24,130 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 @task(name="get_data")
 def task_get_data():
-
     current_task.update_state(state='PROGRESS', meta={'step' : 'downloading legit...'})
     # Загрузка Cisco Umbrella Popularity List (legit).
-    resp = urlopen('http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip')
-    zipfile = ZipFile(BytesIO(resp.read()))
-    zipfile.extractall("get_model/input_data")
+    lv_resp = urlopen('http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip')
+    lv_zipfile = ZipFile(BytesIO(lv_resp.read()))
+    lv_zipfile.extractall("get_model/input_data")
     
     current_task.update_state(state='PROGRESS', meta={'step' : 'downloading dga...'})
     # Загрузка Malware Domain by John Bambenek of Bambenek Consulting (dga).
     urlretrieve('http://osint.bambenekconsulting.com/feeds/dga-feed.txt', 'get_model/input_data/dga.csv')
 
-    training_data = {'legit': [], 'dga': []}
+    lv_training_data = {'legit': [], 'dga': []}
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'inserting domains lists...'})
     # Выделение второго уровная доменного имени.
-    domain_list = pd.read_csv('get_model/input_data/top-1m.csv', names=['domain'])
-    domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
-    domain_list['type'] = 0
-    training_data['legit'] = domain_list.sample(100000)
+    lv_domain_list = pd.read_csv('get_model/input_data/top-1m.csv', names=['domain'])
+    lv_domain_list['domain'] = lv_domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
+    lv_domain_list['type'] = 0
+    lv_training_data['legit'] = lv_domain_list.sample(100000)
 
-    domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
-    domain_list['domain'] = domain_list['domain'].map(lambda x: x.split('.')[0])
-    domain_list['family'] = domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
-    domain_list = domain_list.sample(100000)
-    domain_list['type'] = 1
-    domain_list['subtype'] = pd.factorize(domain_list.family)[0]
-    training_data['dga'] = domain_list
+    lv_domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
+    lv_domain_list['domain'] = lv_domain_list['domain'].map(lambda x: x.split('.')[0])
+    lv_domain_list['family'] = lv_domain_list['family'].fillna('Untitled').map(lambda x: x.split(' ')[3] if (x != 'Untitled') else x)
+    lv_domain_list = lv_domain_list.sample(100000)
+    lv_domain_list['type'] = 1
+    lv_domain_list['subtype'] = pd.factorize(lv_domain_list.family)[0]
+    lv_training_data['dga'] = lv_domain_list
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
-    with open('get_model/input_data/training_data.pkl', 'wb') as f:
-        pickle.dump(training_data, f, pickle.HIGHEST_PROTOCOL)
+    with open('get_model/input_data/training_data.pkl', 'wb') as lv_f:
+        pickle.dump(lv_training_data, lv_f, pickle.HIGHEST_PROTOCOL)
     
     return {'step' : 'training data is prepared.'}
 
 
 @task(name="train_model")
-def task_train_model(output_dim, gru_units, drop_rate, act_func, epochs, batch_size):
+def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_epochs, iv_batch_size):
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading training data...'})
     # Подгрузка данных о доменных именах с диска.
-    with open('get_model/input_data/training_data.pkl', 'rb') as f:
-        training_data = pickle.load(f)
+    with open('get_model/input_data/training_data.pkl', 'rb') as lv_f:
+        lv_training_data = pickle.load(lv_f)
 
     # Общая коллекция данных.
-    all_data_dict = pd.concat([training_data['legit'], training_data['dga']], ignore_index=False, sort=True)
-    dga_data_dict = pd.concat([training_data['dga']], ignore_index=True)
+    lv_all_data_dict = pd.concat([lv_training_data['legit'], lv_training_data['dga']], ignore_index=False, sort=True)
+    lv_dga_data_dict = pd.concat([lv_training_data['dga']], ignore_index=True)
     
     # Равномерное распределение по семьям
-    dga_data_dict = dga_data_dict.groupby('family').apply(lambda x: x.sample(5000, replace=True))
+    lv_dga_data_dict = lv_dga_data_dict.groupby('family').apply(lambda x: x.sample(5000, replace=True))
 
     # Словарь с семьями DGA
-    family_dict = {idx+1:x for idx, x in enumerate(training_data['dga']['family'].unique())}
-    classes = len(family_dict)
+    lv_family_dict = {idx+1:x for idx, x in enumerate(lv_training_data['dga']['family'].unique())}
+    lv_classes = len(lv_family_dict)
 
     # Массив x хранит образцы обучения.
     # В массиве y хранятся целевые значения (метки типов) для образцов обучения.
-    X = np.array(all_data_dict['domain'].tolist())
-    y = np.array(all_data_dict['type'].tolist())
-    X_dga = np.array(dga_data_dict['domain'].tolist())
-    y_dga = np.array(dga_data_dict['subtype'].tolist())
+    lv_X = np.array(lv_all_data_dict['domain'].tolist())
+    lv_y = np.array(lv_all_data_dict['type'].tolist())
+    lv_X_dga = np.array(lv_dga_data_dict['domain'].tolist())
+    lv_y_dga = np.array(lv_dga_data_dict['subtype'].tolist())
 
     # Создание словаря действительных символов.
-    valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(X)))}
+    lv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(lv_X)))}
 
     # Количество уникальных символов.
-    max_features = len(valid_chars) + 1
+    lv_max_features = len(lv_valid_chars) + 1
 
     # Макс последовательность символов.
-    maxlen = np.max([len(x) for x in X])
+    lv_maxlen = np.max([len(x) for x in lv_X])
 
     # Преобразование символов в int и pad (последовательности одиннаковой длины).
-    X = [[valid_chars[y] for y in x] for x in X]
-    X = sequence.pad_sequences(X, maxlen=maxlen)
-    X_dga = [[valid_chars[y] for y in x] for x in X_dga]
-    X_dga = sequence.pad_sequences(X_dga, maxlen=maxlen)
+    lv_X = [[valid_chars[y] for y in x] for x in lv_X]
+    lv_X = sequence.pad_sequences(lv_X, maxlen=lv_maxlen)
+    lv_X_dga = [[valid_chars[y] for y in x] for x in lv_X_dga]
+    lv_X_dga = sequence.pad_sequences(lv_X_dga, maxlen=lv_maxlen)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    # X_dga_train, X_dga_test, y_dga_train, y_dga_test = train_test_split(X_dga, y_dga, test_size=0.2, random_state=0)
-
-    # Построение модели.
-    model = Sequential()
-    model.add(Embedding(max_features, output_dim, input_length=maxlen))
-    model.add(GRU(gru_units))
-    model.add(Dropout(rate=drop_rate))
-    model.add(Dense(1))
-    model.add(Activation(act_func))
-    model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+    lv_X_train, lv_X_test, lv_y_train, lv_y_test = train_test_split(lv_X, lv_y, test_size=0.2, random_state=0)
 
     # Построение модели.
-    model_dga = Sequential()
-    model_dga.add(Embedding(max_features, output_dim, input_length=maxlen))
-    model_dga.add(GRU(gru_units))
-    model_dga.add(Dropout(rate=drop_rate))
-    model_dga.add(Dense(classes))
-    model_dga.add(Activation(act_func))
-    model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
+    lv_model = Sequential()
+    lv_model.add(Embedding(lv_max_features, iv_output_dim, input_length=lv_maxlen))
+    lv_model.add(GRU(iv_gru_units))
+    lv_model.add(Dropout(rate=iv_drop_rate))
+    lv_model.add(Dense(1))
+    lv_model.add(Activation(iv_act_func))
+    lv_model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+
+    # Построение модели.
+    lv_model_dga = Sequential()
+    lv_model_dga.add(Embedding(lv_max_features, iv_output_dim, input_length=lv_maxlen))
+    lv_model_dga.add(GRU(iv_gru_units))
+    lv_model_dga.add(Dropout(rate=iv_drop_rate))
+    lv_model_dga.add(Dense(lv_classes))
+    lv_model_dga.add(Activation(iv_act_func))
+    lv_model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'training dga prediction model...'})
-    best_auc = 0.0
-    for ep in range(epochs):
+    lv_best_auc = 0.0
+    for ep in range(iv_epochs):
 
         # Обучение модели.
-        model.fit(X_train, y_train, epochs=1, batch_size=batch_size)
+        lv_model.fit(lv_X_train, lv_y_train, epochs=1, batch_size=iv_batch_size)
 
-        y_score = model.predict_proba(X_test)
-        auc = roc_auc_score(y_test, y_score)
+        lv_y_score = lv_model.predict_proba(lv_X_test)
+        lv_auc = roc_auc_score(lv_y_test, lv_y_score)
 
-        if auc > best_auc:
-            best_auc = auc
+        if lv_auc > lv_best_auc:
+            lv_best_auc = lv_auc
 
-        status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, auc, best_auc)
-        current_task.update_state(state='PROGRESS', meta={'step' : status})
+        lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, auc, best_auc)
+        current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
 
     # Сохранение модели на диск.
-    model.save('get_model/input_data/dga_prediction_model.h5')
+    lv_model.save('get_model/input_data/dga_prediction_model.h5')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'training family prediction model...'})
 
     # Обучение модели.
-    model_dga.fit(X_dga, y_dga, epochs=epochs, batch_size=batch_size)
+    lv_model_dga.fit(lv_X_dga, lv_y_dga, epochs=iv_epochs, batch_size=iv_batch_size)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
     # Сохранение модели на диск.
-    model_dga.save('get_model/input_data/family_prediction_model.h5')
+    lv_model_dga.save('get_model/input_data/family_prediction_model.h5')
 
     return {'step' : 'models are prepared.'}

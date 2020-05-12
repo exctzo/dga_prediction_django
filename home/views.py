@@ -8,52 +8,51 @@ from django.contrib import messages
 from . import forms
 from . import models
 
-def home(request):
-	return render(request, 'home.html')
+def home(iv_request):
+	return render(iv_request, 'home.html')
 
-def redirect(request):
+def redirect(iv_request):
 	return HttpResponseRedirect("login/")
 
-def register(request):
-	if request.user.is_authenticated :
+def register(iv_request):
+	if iv_request.user.is_authenticated :
 		return HttpResponseRedirect("/")
 
-	if request.method == 'POST' :
-		form = forms.RegisterForm(request.POST)
-		if form.is_valid() :
-			form.save()
-			username = form.cleaned_data.get("username")
-			email = form.cleaned_data.get("email")
-			local_dns_ip = form.cleaned_data.get("local_dns_ip")
-			password = form.cleaned_data.get("password")
+	if iv_request.method == 'POST' :
+		lv_form = forms.RegisterForm(iv_request.POST)
+		if lv_form.is_valid() :
+			lv_form.save()
+			lv_username = lv_form.cleaned_data.get("username")
+			lv_email = lv_form.cleaned_data.get("email")
+			lv_local_dns_ip = lv_form.cleaned_data.get("local_dns_ip")
+			lv_password = lv_form.cleaned_data.get("password")
 			try :
-				user = User.objects.get(username=uservalue)
-				error = {'form':form, 'error':'User name already taken'}
-				return render(request, 'registration/register.html', error)
+				lv_user = User.objects.get(username=uservalue)
+				lv_error = {'form':lv_form, 'error':'User name already taken'}
+				return render(iv_request, 'registration/register.html', lv_error)
 			except :
-				user = User.objects.create_user(username=username, password=password, email=email, first_name=local_dns_ip) 
-				user.save()
-				login(request, user)
+				lv_user = User.objects.create_user(username=lv_username, password=lv_password, email=lv_email, first_name=lv_local_dns_ip) 
+				lv_user.save()
+				login(iv_request, lv_user)
 				return HttpResponseRedirect('/')
 	else :
-		form = forms.RegisterForm()
-	return render(request, 'registration/register.html', {'form':form})
+		lv_form = forms.RegisterForm()
+	return render(iv_request, 'registration/register.html', {'form':lv_form})
 
 @login_required(login_url='/login/')
-def profile(request) :
-	return render(request, 'profile/profile.html')
+def profile(iv_request) :
+	return render(iv_request, 'profile/profile.html')
 
 @login_required(login_url='/login/')
-def update_password(request) :
-	if request.method == 'POST' :
-		form = PasswordChangeForm(request.user, request.POST)
+def update_password(iv_request) :
+	if iv_request.method == 'POST' :
+		lv_form = PasswordChangeForm(iv_request.user, iv_request.POST)
 		if form.is_valid() :
-			user = form.save()
-			update_session_auth_hash(request, user)
-			messages.success(request, 'Your password was successfully updated!')
-			#return HttpResponseRedirect("/")
+			lv_user = form.save()
+			update_session_auth_hash(iv_request, lv_user)
+			messages.success(iv_request, 'Your password was successfully updated!')
 		else :
-			messages.error(request, 'Please correct the error below.')
+			messages.error(iv_request, 'Please correct the error below.')
 	else :
-		form = PasswordChangeForm(request.user)
-	return render(request, 'profile/change-password.html',{'form':form})
+		lv_form = PasswordChangeForm(iv_request.user)
+	return render(iv_request, 'profile/change-password.html',{'form':lv_form})

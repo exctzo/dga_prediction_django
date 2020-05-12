@@ -10,57 +10,56 @@ from celery.task.control import revoke, inspect
 from celery import current_task
 
 @staff_member_required(login_url='/login/')
-def get_task_info(request):
-	task_id = request.GET.get('task_id', None)
-	if task_id is not None:
+def get_task_info(iv_request):
+	lv_task_id = iv_request.GET.get('task_id', None)
+	if lv_task_id is not None:
 		try:
-			task = AsyncResult(task_id)
-			data = {
-				'state': task.state,
-				'result': task.result,
+			lv_task = AsyncResult(lv_task_id)
+			lv_data = {
+				'state': lv_task.state,
+				'result': lv_task.result,
 			}
-			return HttpResponse(json.dumps(data), content_type='application/json')
+			return HttpResponse(json.dumps(lv_data), content_type='application/json')
 		except Exception:
-			data = {'state': 'REVOKED',}
-			return HttpResponse(json.dumps(data), content_type='application/json')
+			lv_data = {'state': 'REVOKED',}
+			return HttpResponse(json.dumps(lv_data), content_type='application/json')
 	else:
 		return HttpResponse('No job id given.')
 
 @staff_member_required(login_url='/login/')
-def revoke_task(request):
-	# task_id = current_task.request.id
-	i = inspect()
-	active_tasks = i.active()
-	task_id = list(active_tasks.values())[0][0]["id"]
-	revoke(task_id, terminate=True)
+def revoke_task(iv_request):
+	lv_i = inspect()
+	lv_active_tasks = lv_i.active()
+	lv_task_id = list(lv_active_tasks.values())[0][0]["id"]
+	revoke(lv_task_id, terminate=True)
 
 @staff_member_required(login_url='/login/')
-def get_model(request) :
-	return render(request, 'get_model.html', {
+def get_model(iv_request) :
+	return render(iv_request, 'get_model.html', {
 		'get_data_form': forms.GetDataForm(),
 		'train_form': forms.TrainForm(),})
 
 @staff_member_required(login_url='/login/')
-def get_data(request) :
-	if request.method == 'POST' :
-		form = forms.GetDataForm(request.POST)
-		task = task_get_data.delay()
-		return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+def get_data(iv_request) :
+	if iv_request.method == 'POST' :
+		lv_form = forms.GetDataForm(iv_request.POST)
+		lv_task = task_get_data.delay()
+		return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else:
 		return HttpResponse('Request metod isnt POST')
 
 @staff_member_required(login_url='/login/')
-def train_model(request) :
-	if request.method == 'POST' :
-		form = forms.TrainForm(request.POST)
-		if form.is_valid() :
-			output_dim = form.cleaned_data.get("output_dim")
-			gru_units = form.cleaned_data.get("gru_units")
-			drop_rate = form.cleaned_data.get("drop_rate")
-			act_func = form.cleaned_data.get("act_func")
-			epochs = form.cleaned_data.get("epochs")
-			batch_size = form.cleaned_data.get("batch_size")
-			task = task_train_model.delay(output_dim, gru_units, drop_rate, act_func, epochs, batch_size)
-			return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+def train_model(iv_request) :
+	if iv_request.method == 'POST' :
+		lv_form = forms.TrainForm(iv_request.POST)
+		if lv_form.is_valid() :
+			lv_output_dim = form.cleaned_data.get("output_dim")
+			lv_gru_units = form.cleaned_data.get("gru_units")
+			lv_drop_rate = form.cleaned_data.get("drop_rate")
+			lv_act_func = form.cleaned_data.get("act_func")
+			lv_epochs = form.cleaned_data.get("epochs")
+			lv_batch_size = form.cleaned_data.get("batch_size")
+			lv_task = task_train_model.delay(lv_output_dim, lv_gru_units, lv_drop_rate, lv_act_func, lv_epochs, lv_batch_size)
+			return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else :
 		return HttpResponse('Request metod isnt POST')

@@ -18,10 +18,10 @@ class TrainForm(forms.Form) :
     drop_rate = forms.FloatField(label="Dropout rate (float)", widget=forms.NumberInput(), initial=0.5)
 
     # Activation func ('sigmoid')
-    ACT_FUNC_CHOICES = (
+    act_func_choices = (
     ('sigmoid', 'sigmoid'),
     ('relu', 'relu')) 
-    act_func = forms.ChoiceField(label="Activation function", choices=ACT_FUNC_CHOICES, 
+    act_func = forms.ChoiceField(label="Activation function", choices=act_func_choices, 
                                 widget=forms.Select(), required=True, initial='sigmoid')
 
     # Epoch
