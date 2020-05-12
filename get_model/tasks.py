@@ -132,7 +132,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         if lv_auc > lv_best_auc:
             lv_best_auc = lv_auc
 
-        lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, auc, best_auc)
+        lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, lv_auc, lv_best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
