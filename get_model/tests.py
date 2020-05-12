@@ -51,7 +51,7 @@ class GetDataModelTest(TestCase):
         lv_training_data['dga'] = lv_domain_list
 
         with open('get_model/input_data/test/training_data.pkl', 'wb') as lv_f:
-            pickle.dump(training_data, lv_f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(lv_training_data, lv_f, pickle.HIGHEST_PROTOCOL)
         
     def test_get_model(self):
         # Подгрузка данных о доменных именах с диска.
