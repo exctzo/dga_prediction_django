@@ -86,9 +86,9 @@ class GetDataModelTest(TestCase):
         lv_maxlen = np.max([len(x) for x in lv_X])
 
         # Преобразование символов в int и pad (последовательности одиннаковой длины).
-        lv_X = [[valid_chars[y] for y in x] for x in lv_X]
+        lv_X = [[lv_valid_chars[y] for y in x] for x in lv_X]
         lv_X = sequence.pad_sequences(X, maxlen=lv_maxlen)
-        lv_X_dga = [[valid_chars[y] for y in x] for x in lv_X_dga]
+        lv_X_dga = [[lv_valid_chars[y] for y in x] for x in lv_X_dga]
         lv_X_dga = sequence.pad_sequences(lv_X_dga, maxlen=lv_maxlen)
 
         lv_X_train, lv_X_test, lv_y_train, lv_y_test = train_test_split(lv_X, lv_y, test_size=0.2, random_state=0)
