@@ -87,7 +87,7 @@ class GetDataModelTest(TestCase):
 
         # Преобразование символов в int и pad (последовательности одиннаковой длины).
         lv_X = [[lv_valid_chars[y] for y in x] for x in lv_X]
-        lv_X = sequence.pad_sequences(X, maxlen=lv_maxlen)
+        lv_X = sequence.pad_sequences(lv_X, maxlen=lv_maxlen)
         lv_X_dga = [[lv_valid_chars[y] for y in x] for x in lv_X_dga]
         lv_X_dga = sequence.pad_sequences(lv_X_dga, maxlen=lv_maxlen)
 
