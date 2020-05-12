@@ -29,7 +29,7 @@ def dga_lineplot(iv_common_user_ip=None):
     # Edit the layout
     lv_fig.update_layout(xaxis_title='Dates',yaxis_title='Requests Count')
 
-    lv_plot_div = plot(fig, output_type='div',filename='line')
+    lv_plot_div = plot(lv_fig, output_type='div',filename='line')
     return lv_plot_div
 
 
