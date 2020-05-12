@@ -53,12 +53,12 @@ def train_model(iv_request) :
 	if iv_request.method == 'POST' :
 		lv_form = forms.TrainForm(iv_request.POST)
 		if lv_form.is_valid() :
-			lv_output_dim = form.cleaned_data.get("output_dim")
-			lv_gru_units = form.cleaned_data.get("gru_units")
-			lv_drop_rate = form.cleaned_data.get("drop_rate")
-			lv_act_func = form.cleaned_data.get("act_func")
-			lv_epochs = form.cleaned_data.get("epochs")
-			lv_batch_size = form.cleaned_data.get("batch_size")
+			lv_output_dim = lv_formform.cleaned_data.get("output_dim")
+			lv_gru_units = lv_formform.cleaned_data.get("gru_units")
+			lv_drop_rate = lv_formform.cleaned_data.get("drop_rate")
+			lv_act_func = lv_formform.cleaned_data.get("act_func")
+			lv_epochs = lv_formform.cleaned_data.get("epochs")
+			lv_batch_size = lv_formform.cleaned_data.get("batch_size")
 			lv_task = task_train_model.delay(lv_output_dim, lv_gru_units, lv_drop_rate, lv_act_func, lv_epochs, lv_batch_size)
 			return HttpResponse(json.dumps({'task_id': lv_task.id}), content_type='application/json')
 	else :
