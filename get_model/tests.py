@@ -109,7 +109,7 @@ class GetDataModelTest(TestCase):
         lv_model_dga.add(Embedding(lv_max_features, 128, input_length=lv_maxlen))
         lv_model_dga.add(GRU(128))
         lv_model_dga.add(Dropout(rate=0.5))
-        lv_model_dga.add(Dense(classes))
+        lv_model_dga.add(Dense(lv_classes))
         lv_model_dga.add(Activation('sigmoid'))
         lv_model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
 
