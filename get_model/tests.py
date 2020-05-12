@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 class GetDataModelTest(TestCase):
 
-    def test_prepare_data(self):
+    def Test_prepare_data(self):
         # Загрузка Cisco Umbrella Popularity List (legit).
         lv_resp = urlopen('http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip')
         lv_zipfile = ZipFile(BytesIO(lv_resp.read()))
@@ -53,7 +53,7 @@ class GetDataModelTest(TestCase):
         with open('get_model/input_data/test/training_data.pkl', 'wb') as lv_f:
             pickle.dump(lv_training_data, lv_f, pickle.HIGHEST_PROTOCOL)
         
-    def test_get_model(self):
+    def Test_get_model(self):
         # Подгрузка данных о доменных именах с диска.
         with open('get_model/input_data/test/training_data.pkl', 'rb') as lv_f:
             lv_training_data = pickle.load(lv_f)
@@ -131,3 +131,7 @@ class GetDataModelTest(TestCase):
         # Проверка валидности классификации
         assert lv_pred_class is not None
         assert lv_pred_proba is not None
+
+def test_prepare_for_sniff(self):
+    self.Test_prepare_data()
+    self.Test_get_model()
