@@ -31,7 +31,7 @@ class UsersTest(TestCase):
         lv_request.user = self.lv_user
 
         # Тестирование profile() представления.
-        lv_response = lv_profile(lv_request)
+        lv_response = profile(lv_request)
 
         # Проверка корректности кода ответа.
         self.assertEqual(lv_response.status_code, 200)
