@@ -6,6 +6,7 @@ warnings.filterwarnings('ignore',category=FutureWarning)
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 
+import shutil
 import pickle
 import random
 from io import BytesIO
@@ -135,3 +136,4 @@ class GetDataModelTest(TestCase):
 def test_prepare_for_sniff(self):
     self.Test_prepare_data()
     self.Test_get_model()
+    shutil.rmtree('get_model/input_data/test', ignore_errors=True)
