@@ -81,8 +81,8 @@ def statistic(iv_request) :
 	return render(iv_request, 'statistic.html', {'hosts_list':lv_hosts_list, 'requests_list':lv_requests_list})
 
 @login_required(login_url='/login/')
-def statsbyhost(iv_request, iv_pk):
-	lv_requested_host = iv_pk
+def statsbyhost(iv_request, pk):
+	lv_requested_host = pk
 	lv_count_requests = models.Requests.objects.filter(ip_src=lv_requested_host).annotate(count=Count('ip_src'))
 	lv_count_dga_requests = models.Requests.objects.filter(ip_src=lv_requested_host,dga=1).annotate(count=Count('ip_src'))
 	lv_requests_by_host = models.Requests.objects.filter(ip_src=lv_requested_host)
