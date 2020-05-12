@@ -2,15 +2,21 @@ from plotly.offline import plot
 import plotly.graph_objs as go 
 import pandas as pd 
 from datetime import datetime
+from django.db.models.functions import Trunc
 import requests
 from . import models
 from django.db.models import Count
 
-def dga_lineplot():
+def dga_lineplot(common_user_ip=None):
 
-    dga = models.Requests.objects.filter(dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
-    non_dga = models.Requests.objects.filter(dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+    if common_user_ip is not None:
+        dga = models.Requests.objects.filter(ip_src=common_user_ip,dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        non_dga = models.Requests.objects.filter(ip_src=common_user_ip,dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+    else:
+        dga = models.Requests.objects.filter(dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        non_dga = models.Requests.objects.filter(dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
 
+        
     dga_dates = [i['trunced_date'] for i in dga]
     non_dga_dates = [i['trunced_date'] for i in non_dga]
     dga_requests_counts = [i['count'] for i in dga]
@@ -31,13 +37,13 @@ def dga_lineplot():
     return plot_div
 
 
-def hosts_piechart():
+def hosts_piechart(common_user_ip=None):
 
-    #labels = [i[0] for i in models.Hosts.objects.values_list('ip')]
-    #values = [i[0] for i in models.Hosts.objects.values_list('requests_count')]
+    if common_user_ip is not None:
+        data = models.Requests.objects.filter(ip_src=common_user_ip,dga=1).values('ip_src').annotate(count=Count('ip_src'))
+    else:
+        data = models.Requests.objects.filter(dga=1).values('ip_src').annotate(count=Count('ip_src'))
 
-    data = models.Requests.objects.filter(dga=1).values('ip_src').annotate(count=Count('ip_src'))
-    
     labels = [i['ip_src'] for i in data]
     values = [i['count']  for i in data]
 
@@ -49,12 +55,12 @@ def hosts_piechart():
     return plot_div
 
 
-def families_piechart():
+def families_piechart(common_user_ip=None):
 
-    #labels = [i[0] for i in models.Hosts.objects.values_list('ip')]
-    #values = [i[0] for i in models.Hosts.objects.values_list('requests_count')]
-
-    data = models.Requests.objects.filter(dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
+    if common_user_ip is not None:
+        data = models.Requests.objects.filter(ip_src=common_user_ip,dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
+    else:
+        data = models.Requests.objects.filter(dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
     
     labels = [i['dga_subtype'] for i in data]
     values = [i['count']  for i in data]

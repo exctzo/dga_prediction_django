@@ -31,15 +31,16 @@
 			</div>
 		</div>
 
-		
-		<div class="card" style="width: 100%;margin-top: 15px">
-		
-			<div class="card-body">
-				<h5 class="card-title">Potentially DGA requests by hosts</h5>
-			{{hosts_piechart|safe}}
-			</div>
+		{% if request.user.is_superuser %}
+			<div class="card" style="width: 100%;margin-top: 15px">
+			
+				<div class="card-body">
+					<h5 class="card-title">Potentially DGA requests by hosts</h5>
+				{{hosts_piechart|safe}}
+				</div>
 
-		</div>
+			</div>
+		{% endif %}
 
 
 		<div class="card" style="width: 100%;margin-top: 15px">

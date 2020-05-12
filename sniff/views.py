@@ -72,11 +72,9 @@ def sniff(iv_request) :
 @login_required(login_url='/login/')
 def statistic(request) :
 	if request.user.is_superuser:
-		#hosts_list = models.Hosts.objects.order_by("-requests_count")
 		hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
 		local_dns_ip = request.user.local_dns_ip
-		#hosts_list = models.Hosts.objects.filter(ip=local_dns_ip).order_by("-requests_count")
 		hosts_list = models.Requests.objects.filter(ip_src=local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	requests_list = models.Requests.objects.order_by("report_date")
 
@@ -85,7 +83,6 @@ def statistic(request) :
 @login_required(login_url='/login/')
 def statsbyhost(request, pk):
 	requested_host = pk
-	#requested_host_details = models.Hosts.objects.get(ip=requested_host)
 	count_requests = models.Requests.objects.filter(ip_src=requested_host).annotate(count=Count('ip_src'))
 	count_dga_requests = models.Requests.objects.filter(ip_src=requested_host,dga=1).annotate(count=Count('ip_src'))
 	requests_by_host = models.Requests.objects.filter(ip_src=requested_host)
@@ -95,4 +92,7 @@ def statsbyhost(request, pk):
 @login_required(login_url='/login/')
 @cache_page(CACHE_TTL)
 def dashboard(request):
-	return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
+	if request.user.is_superuser:
+		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
+	else:
+		return render(request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(request.user.local_dns_ip),'families_piechart':plots.families_piechart(request.user.local_dns_ip)})
