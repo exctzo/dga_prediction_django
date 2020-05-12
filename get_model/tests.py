@@ -133,7 +133,7 @@ class GetDataModelTest(TestCase):
         assert lv_pred_class is not None
         assert lv_pred_proba is not None
 
-def test_prepare_for_sniff(self):
-    self.Test_prepare_data()
-    self.Test_get_model()
-    shutil.rmtree('get_model/input_data/test', ignore_errors=True)
+    def test_prepare_for_sniff(self):
+        self.Test_prepare_data()
+        self.Test_get_model()
+        shutil.rmtree('get_model/input_data/test', ignore_errors=True)
