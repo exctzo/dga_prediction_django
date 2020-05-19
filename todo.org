@@ -1,0 +1,2 @@
+* TODO Save processing condition after refresh page (check if celery task already execute)
+* TODO Put temporary files on learning process in tmp directory
