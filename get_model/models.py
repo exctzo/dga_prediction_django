@@ -1,15 +1,16 @@
 from django.db import models
 
-class PreparedDatasets(models.Model) :
+class PreparedDataset(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
     legit_size = models.IntegerField()
     dga_size = models.IntegerField()
     family_size = models.IntegerField()
 
-class PreparedModels(models.Model) :
+class PreparedModel(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
     model_type = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
+    id_dataset = models.ForeignKey('PreparedDataset')
     max_features = models.IntegerField()
     model_units = models.IntegerField()
     drop_rate = models.FloatField()
@@ -19,10 +20,9 @@ class PreparedModels(models.Model) :
     epochs = models.IntegerField()
     batch_size = models.IntegerField()
 
-class ModelsLearningStat(models.Model) :
+class ModelLearningStat(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
-    model_type = models.CharField(max_length=20)
-    model = models.CharField(max_length=20)
+    id_model= models.ForeignKey('PreparedModel')
     epoch = models.IntegerField()
     auc = models.FloatField(blank=True, null=True)
     accuracy = models.FloatField()

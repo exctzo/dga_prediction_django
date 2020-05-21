@@ -48,7 +48,6 @@ def task_get_data():
     lv_domain_list['type'] = 0
     lv_training_data['legit'] = lv_domain_list.sample(100000)
     lv_legit_size = lv_training_data['legit'].size
-    print(lv_legit_size)
 
     lv_domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
     lv_domain_list['domain'] = lv_domain_list['domain'].map(lambda x: x.split('.')[0])
@@ -59,8 +58,6 @@ def task_get_data():
     lv_training_data['dga'] = lv_domain_list
     lv_dga_size = lv_training_data['dga'].size
     lv_family_size = lv_training_data['dga'].groupby('family').ngroups
-    print(lv_dga_size)
-    print(lv_family_size)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
     with open('get_model/input_data/training_data.pkl', 'wb') as lv_f:
@@ -80,6 +77,8 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     with open('get_model/input_data/training_data.pkl', 'rb') as lv_f:
         lv_training_data = pickle.load(lv_f)
 
+    lv_datasetd_id = models.PreparedDatasets.objects.latest('id').id
+
     # Общая коллекция данных.
     lv_all_data_dict = pd.concat([lv_training_data['legit'], lv_training_data['dga']], ignore_index=False, sort=True)
     lv_dga_data_dict = pd.concat([lv_training_data['dga']], ignore_index=True)
@@ -95,8 +94,8 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     # В массиве y хранятся целевые значения (метки типов) для образцов обучения.
     lv_X = np.array(lv_all_data_dict['domain'].tolist())
     lv_y = np.array(lv_all_data_dict['type'].tolist())
-    lv_X_dga = np.array(lv_dga_data_dict['domain'].tolist())
-    lv_y_dga = np.array(lv_dga_data_dict['subtype'].tolist())
+    lv_X_family = np.array(lv_dga_data_dict['domain'].tolist())
+    lv_y_family = np.array(lv_dga_data_dict['subtype'].tolist())
 
     # Создание словаря действительных символов.
     lv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(lv_X)))}
@@ -110,11 +109,11 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     # Преобразование символов в int и pad (последовательности одиннаковой длины).
     lv_X = [[lv_valid_chars[y] for y in x] for x in lv_X]
     lv_X = sequence.pad_sequences(lv_X, maxlen=lv_maxlen)
-    lv_X_dga = [[lv_valid_chars[y] for y in x] for x in lv_X_dga]
-    lv_X_dga = sequence.pad_sequences(lv_X_dga, maxlen=lv_maxlen)
+    lv_X_family = [[lv_valid_chars[y] for y in x] for x in lv_X_family]
+    lv_X_family = sequence.pad_sequences(lv_X_family, maxlen=lv_maxlen)
 
     lv_X_train, lv_X_test, lv_y_train, lv_y_test = train_test_split(lv_X, lv_y, test_size=0.2, random_state=0)
-    lv_X_dga_train, lv_X_dga_test, lv_y_dga_train, lv_y_dga_test = train_test_split(lv_X_dga, lv_y_dga, test_size=0.2, random_state=0)
+    lv_X_family_train, lv_X_family_test, lv_y_family_train, lv_y_family_test = train_test_split(lv_X_family, lv_y_family, test_size=0.2, random_state=0)
 
     # Построение модели.
     lv_model = Sequential()
@@ -126,13 +125,17 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     lv_model.compile(loss='binary_crossentropy', optimizer='rmsprop')
 
     # Построение модели.
-    lv_model_dga = Sequential()
-    lv_model_dga.add(Embedding(lv_max_features, iv_output_dim, input_length=lv_maxlen))
-    lv_model_dga.add(GRU(iv_gru_units))
-    lv_model_dga.add(Dropout(rate=iv_drop_rate))
-    lv_model_dga.add(Dense(lv_classes))
-    lv_model_dga.add(Activation(iv_act_func))
-    lv_model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
+    lv_model_family = Sequential()
+    lv_model_family.add(Embedding(lv_max_features, iv_output_dim, input_length=lv_maxlen))
+    lv_model_family.add(GRU(iv_gru_units))
+    lv_model_family.add(Dropout(rate=iv_drop_rate))
+    lv_model_family.add(Dense(lv_classes))
+    lv_model_family.add(Activation(iv_act_func))
+    lv_model_family.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
+
+    lv_db_model = models.PreparedModel(model_type='binary', model='GRU', id_dataset=lv_datasetd_id, max_features=lv_max_features, model_units=iv_gru_units, 
+        drop_rate=iv_drop_rate, classes='2', act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
+    lv_db_model.save()
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'training dga prediction model...'})
     lv_best_auc = 0.0
@@ -156,9 +159,9 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, lv_auc, lv_best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
-        lv_db_models_stat = models.ModelsLearningStat(model_type='binary', model='GRU', epoch=ep+1, auc=lv_auc, accuracy=lv_accuracy, 
+        lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model.id, epoch=ep+1, auc=lv_auc, accuracy=lv_accuracy, 
             precision=lv_precision, recall=lv_recall, f1=lv_f1)
-        lv_db_models_stat.save()
+        lv_db_model_stat.save()
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
 
@@ -168,31 +171,27 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     # Сохранение модели на диск.
     lv_model.save('get_model/input_data/dga_prediction_model.h5')
 
-    lv_db_models = models.PreparedModels(model_type='binary', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
-        drop_rate=iv_drop_rate, classes='2', act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
-    lv_db_models.save()
-
     current_task.update_state(state='PROGRESS', meta={'step' : 'training family prediction model...'})
 
     # Обучение модели.
-    lv_model_dga.fit(lv_X_dga_train, lv_y_dga_train, epochs=iv_epochs, batch_size=iv_batch_size)
+    lv_model_family.fit(lv_X_family_train, lv_y_family_train, epochs=iv_epochs, batch_size=iv_batch_size)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'counting model scores...'})
     
-    lv_y_dga_pred = lv_model_dga.predict_classes(lv_X_dga_test)
+    lv_y_family_pred = lv_model_family.predict_classes(lv_X_family_test)
 
-    lv_accuracy = accuracy_score(lv_y_dga_test, lv_y_dga_pred)
-    lv_precision = precision_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
-    lv_recall = recall_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
-    lv_f1 = f1_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
+    lv_accuracy = accuracy_score(lv_y_family_test, lv_y_family_pred)
+    lv_precision = precision_score(lv_y_family_test, lv_y_family_pred, average='macro')
+    lv_recall = recall_score(lv_y_family_test, lv_y_family_pred, average='macro')
+    lv_f1 = f1_score(lv_y_family_test, lv_y_family_pred, average='macro')
 
-    lv_db_models_stat = models.ModelsLearningStat(model_type='multiclass', model='GRU', epoch=iv_epochs, accuracy=lv_accuracy, 
-        precision=lv_precision, recall=lv_recall, f1=lv_f1)
-    lv_db_models_stat.save()
-
-    lv_db_models = models.PreparedModels(model_type='multiclass', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
+    lv_db_model = models.PreparedModel(model_type='multiclass', model='GRU', id_dataset=lv_datasetd_id, max_features=lv_max_features, model_units=iv_gru_units, 
         drop_rate=iv_drop_rate, classes=lv_classes, act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
-    lv_db_models.save()
+    lv_db_model.save()
+
+    lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model.id, epoch=iv_epochs, accuracy=lv_accuracy, 
+        precision=lv_precision, recall=lv_recall, f1=lv_f1)
+    lv_db_model_stat.save()
 
     if os.path.exists('get_model/input_data/family_prediction_model.h5'):
         os.remove('get_model/input_data/family_prediction_model.h5')
@@ -200,7 +199,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
     # Сохранение модели на диск.
-    lv_model_dga.save('get_model/input_data/family_prediction_model.h5')
+    lv_model_family.save('get_model/input_data/family_prediction_model.h5')
 
     os.path.exists("/home/el/myfile.txt")
 

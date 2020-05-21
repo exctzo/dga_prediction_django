@@ -9,3 +9,6 @@ class Requests(models.Model) :
     dga_proba = models.FloatField()
     dga_subtype = models.CharField(max_length=250,null=True)
     dga_subtype_proba = models.FloatField(null=True)
+    id_dataset = models.ForeignKey('get_model.PreparedDatasets')
+    id_model_dga = models.ForeignKey('get_model.PreparedDatasets')
+    id_model_family = models.ForeignKey('get_model.PreparedDatasets')

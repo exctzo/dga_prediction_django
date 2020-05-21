@@ -1,7 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 from celery.decorators import task
 from celery import current_task
-from . import models
+from .models import Requests
+from get_model.models import PreparedModel, PreparedDataset
 
 import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
@@ -75,7 +76,8 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
         # Сохранение в логах
         gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
     # Сохранение в базе
-    lv_req = models.Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob)
+    lv_req = Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
+        dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob, id_dataset=gv_id_dataset, id_model_dga=gv_id_model_dga, id_model_family=gv_id_model_family)
     lv_req.save()
 
 
@@ -134,18 +136,28 @@ def task_capture(iv_interface, iv_as_proxy=False, iv_dns_up_ip=None, iv_port=Non
     global gv_session
     global gv_graph
     global gv_pre_domain
+    global gv_id_dataset
+    global gv_id_model_dga
+    global gv_id_model_family
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading dga prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
         gv_model = load_model('get_model/input_data/dga_prediction_model.h5')
 
+    gv_id_model_dga = PreparedModel.objects.filter(model_type='binary').latest('id').id
+
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading family prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
         gv_model_dga = load_model('get_model/input_data/family_prediction_model.h5')
 
+    gv_id_model_family = PreparedModel.objects.filter(model_type='multiclass').latest('id').id
+
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for models...'})
     with open('get_model/input_data/training_data.pkl', 'rb') as f:
         lv_training_data = pickle.load(f)
+
+    gv_id_dataset = PreparedDataset.objects.latest('id').id
+
     lv_all_data_dict = pd.concat([lv_training_data['legit'][:100000], lv_training_data['dga'][:100000]], 
                                 ignore_index=False, sort=True)
     gv_family_dict = {idx:x for idx, x in enumerate(lv_training_data['dga']['family'].unique())}
