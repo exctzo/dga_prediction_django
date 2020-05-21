@@ -182,9 +182,9 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     lv_y_dga_pred = lv_model_dga.predict_classes(lv_X_dga_test)
 
     lv_accuracy = accuracy_score(lv_y_dga_test, lv_y_dga_pred)
-    lv_precision = precision_score(lv_y_dga_test, lv_y_dga_pred)
-    lv_recall = recall_score(lv_y_dga_test, lv_y_dga_pred)
-    lv_f1 = f1_score(lv_y_dga_test, lv_y_dga_pred)
+    lv_precision = precision_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
+    lv_recall = recall_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
+    lv_f1 = f1_score(lv_y_dga_test, lv_y_dga_pred, average='macro')
 
     lv_db_models_stat = models.ModelsLearningStat(model_type='multiclass', model='GRU', epoch=iv_epochs, accuracy=lv_accuracy, 
         precision=lv_precision, recall=lv_recall, f1=lv_f1)
