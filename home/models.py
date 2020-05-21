@@ -18,7 +18,7 @@ class User(AbstractBaseUser) :
 	is_admin = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)
 
-	# objects = UserManager()
+	objects = UserManager()
 
 # user_model = get_user_model()
 # user_model.add_to_class("local_dns_ip", models.GenericIPAddressField(default = '0.0.0.0'))
