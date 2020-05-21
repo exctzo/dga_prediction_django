@@ -24,7 +24,7 @@ class ModelsLearningStat(models.Model) :
     model_type = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
     epoch = models.IntegerField()
-    auc = models.FloatField(blank=True, default=None)
+    auc = models.FloatField(blank=True, null=True)
     accuracy = models.FloatField()
     precision = models.FloatField()
     recall = models.FloatField()
