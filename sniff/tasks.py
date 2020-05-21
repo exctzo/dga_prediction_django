@@ -77,7 +77,7 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
         # Сохранение в логах
         gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
 
-    lv_id_user = User.objects.filter(first_name=ip_src).id
+    lv_id_user = User.objects.filter(first_name=ip_src)
 
     # Сохранение в базе
     lv_req = Request(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
@@ -148,19 +148,19 @@ def task_capture(iv_interface, iv_as_proxy=False, iv_dns_up_ip=None, iv_port=Non
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
         gv_model = load_model('get_model/input_data/dga_prediction_model.h5')
 
-    gv_id_model_dga = PreparedModel.objects.filter(model_type='binary').latest('id').id
+    gv_id_model_dga = PreparedModel.objects.filter(model_type='binary').latest('id')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading family prediction model from disk...'})
     with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
         gv_model_dga = load_model('get_model/input_data/family_prediction_model.h5')
 
-    gv_id_model_family = PreparedModel.objects.filter(model_type='multiclass').latest('id').id
+    gv_id_model_family = PreparedModel.objects.filter(model_type='multiclass').latest('id')
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'loading data for models...'})
     with open('get_model/input_data/training_data.pkl', 'rb') as f:
         lv_training_data = pickle.load(f)
 
-    gv_id_dataset = PreparedDataset.objects.latest('id').id
+    gv_id_dataset = PreparedDataset.objects.latest('id')
 
     lv_all_data_dict = pd.concat([lv_training_data['legit'][:100000], lv_training_data['dga'][:100000]], 
                                 ignore_index=False, sort=True)
