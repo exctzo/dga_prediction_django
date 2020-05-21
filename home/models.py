@@ -11,12 +11,12 @@ class User(AbstractBaseUser) :
 	password = models.CharField(max_length=50)
 	email = models.EmailField(max_length=250, unique=True)
 	local_dns_ip = models.CharField(max_length=30, default = '0.0.0.0')
-    is_superuser = models.BooleanField(default=False) 
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(verbose_name="date joined", auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name="last login", auto_now=True)
-    is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+	is_superuser = models.BooleanField(default=False) 
+	is_staff = models.BooleanField(default=False)
+	date_joined = models.DateTimeField(verbose_name="date joined", auto_now_add=True)
+	last_login = models.DateTimeField(verbose_name="last login", auto_now=True)
+	is_admin = models.BooleanField(default=False)
+	is_active = models.BooleanField(default=True)
 
 	# objects = UserManager()
 
