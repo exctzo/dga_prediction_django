@@ -5,7 +5,7 @@ from django.db import models
 class User(AbstractBaseUser) :
 
 	USERNAME_FIELD = 'username'
-	REQUIRED_FIELDS = ('username','password','email','local_dns_ip')
+	REQUIRED_FIELDS = ('password','email','local_dns_ip')
 
 	username = models.CharField(max_length=250, primary_key=True)
 	password = models.CharField(max_length=50)
