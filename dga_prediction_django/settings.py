@@ -77,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dga_prediction_django.wsgi.application'
 
-AUTH_USER_MODEL = 'home.User'
+# AUTH_USER_MODEL = 'home.User'
 
 
 # Database

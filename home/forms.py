@@ -8,9 +8,9 @@ class RegisterForm(forms.ModelForm) :
 	local_dns_ip = forms.GenericIPAddressField(label="Local DNS IP", widget=forms.TextInput(), required=True)
 	password = forms.CharField(max_length=250, min_length=8, label="Password", widget=forms.TextInput(attrs={'type':'password'}))
 
-	class Meta :
-		model = models.User
-		fields = ["username","password","email","local_dns_ip"]
+	# class Meta :
+	# 	model = models.User
+	# 	fields = ["username","password","email","local_dns_ip"]
 
 class LoginForm(AuthenticationForm) :
 	username = forms.CharField(max_length=50, label="User Name")
