@@ -10,7 +10,7 @@ class PreparedModel(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
     model_type = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
-    id_dataset = models.ForeignKey('PreparedDataset')
+    id_dataset = models.ForeignKey('PreparedDataset', on_delete=models.SET_NULL, blank=True, null=True)
     max_features = models.IntegerField()
     model_units = models.IntegerField()
     drop_rate = models.FloatField()
@@ -22,7 +22,7 @@ class PreparedModel(models.Model) :
 
 class ModelLearningStat(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
-    id_model= models.ForeignKey('PreparedModel')
+    id_model= models.ForeignKey('PreparedModel', on_delete=models.SET_NULL, blank=True, null=True)
     epoch = models.IntegerField()
     auc = models.FloatField(blank=True, null=True)
     accuracy = models.FloatField()
