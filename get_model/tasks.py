@@ -179,7 +179,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
-    lv_y_dga_pred = model_dga.predict_classes(X_dga_test)
+    lv_y_dga_pred = lv_model_dga.predict_classes(X_dga_test)
 
     lv_accuracy = accuracy_score(lv_y_dga_test, lv_y_dga_pred)
     lv_precision = precision_score(lv_y_dga_test, lv_y_dga_pred)
