@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery.decorators import task
 from celery import current_task
-from .models import Requests
+from .models import Request
 from get_model.models import PreparedModel, PreparedDataset
 
 import warnings
@@ -76,7 +76,7 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
         # Сохранение в логах
         gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
     # Сохранение в базе
-    lv_req = Requests(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
+    lv_req = Request(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
         dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob, id_dataset=gv_id_dataset, id_model_dga=gv_id_model_dga, id_model_family=gv_id_model_family)
     lv_req.save()
 

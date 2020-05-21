@@ -9,11 +9,11 @@ from django.db.models import Count
 
 def dga_lineplot(iv_common_user_ip=None):
     if iv_common_user_ip is not None:
-        lv_dga = models.Requests.objects.filter(ip_src=iv_common_user_ip,dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
-        lv_non_dga = models.Requests.objects.filter(ip_src=iv_common_user_ip,dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        lv_dga = models.Request.objects.filter(ip_src=iv_common_user_ip,dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        lv_non_dga = models.Request.objects.filter(ip_src=iv_common_user_ip,dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
     else:
-        lv_dga = models.Requests.objects.filter(dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
-        lv_non_dga = models.Requests.objects.filter(dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        lv_dga = models.Request.objects.filter(dga=1).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
+        lv_non_dga = models.Request.objects.filter(dga=0).annotate(trunced_date=Trunc('report_date', 'minute')).values('trunced_date').annotate(count=Count('trunced_date')).order_by("trunced_date")
         
     lv_dga_dates = [i['trunced_date'] for i in lv_dga]
     lv_non_dga_dates = [i['trunced_date'] for i in lv_non_dga]
@@ -35,9 +35,9 @@ def dga_lineplot(iv_common_user_ip=None):
 
 def hosts_piechart(iv_common_user_ip=None):
     if iv_common_user_ip is not None:
-        lv_data = models.Requests.objects.filter(ip_src=iv_common_user_ip,dga=1).values('ip_src').annotate(count=Count('ip_src'))
+        lv_data = models.Request.objects.filter(ip_src=iv_common_user_ip,dga=1).values('ip_src').annotate(count=Count('ip_src'))
     else:
-        lv_data = models.Requests.objects.filter(dga=1).values('ip_src').annotate(count=Count('ip_src'))
+        lv_data = models.Request.objects.filter(dga=1).values('ip_src').annotate(count=Count('ip_src'))
 
     lv_labels = [i['ip_src'] for i in lv_data]
     lv_values = [i['count']  for i in lv_data]
@@ -51,9 +51,9 @@ def hosts_piechart(iv_common_user_ip=None):
 
 def families_piechart(iv_common_user_ip=None):
     if iv_common_user_ip is not None:
-        lv_data = models.Requests.objects.filter(ip_src=iv_common_user_ip,dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
+        lv_data = models.Request.objects.filter(ip_src=iv_common_user_ip,dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
     else:
-        lv_data = models.Requests.objects.filter(dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
+        lv_data = models.Request.objects.filter(dga=1).values('dga_subtype').annotate(count=Count('dga_subtype'))
     
     lv_labels = [i['dga_subtype'] for i in lv_data]
     lv_values = [i['count']  for i in lv_data]

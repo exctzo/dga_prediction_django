@@ -72,20 +72,20 @@ def sniff(iv_request) :
 @login_required(login_url='/login/')
 def statistic(iv_request) :
 	if iv_request.user.is_superuser:
-		lv_hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
+		lv_hosts_list = models.Request.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
 		lv_local_dns_ip = iv_request.user.local_dns_ip
-		lv_hosts_list = models.Requests.objects.filter(ip_src=lv_local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
-	lv_requests_list = models.Requests.objects.order_by("report_date")
+		lv_hosts_list = models.Request.objects.filter(ip_src=lv_local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
+	lv_requests_list = models.Request.objects.order_by("report_date")
 
 	return render(iv_request, 'statistic.html', {'hosts_list':lv_hosts_list, 'requests_list':lv_requests_list})
 
 @login_required(login_url='/login/')
 def statsbyhost(iv_request, pk):
 	lv_requested_host = pk
-	lv_count_requests = models.Requests.objects.filter(ip_src=lv_requested_host).annotate(count=Count('ip_src'))
-	lv_count_dga_requests = models.Requests.objects.filter(ip_src=lv_requested_host,dga=1).annotate(count=Count('ip_src'))
-	lv_requests_by_host = models.Requests.objects.filter(ip_src=lv_requested_host)
+	lv_count_requests = models.Request.objects.filter(ip_src=lv_requested_host).annotate(count=Count('ip_src'))
+	lv_count_dga_requests = models.Request.objects.filter(ip_src=lv_requested_host,dga=1).annotate(count=Count('ip_src'))
+	lv_requests_by_host = models.Request.objects.filter(ip_src=lv_requested_host)
 	
 	return render(iv_request, 'host.html', {'host':lv_requested_host,'count_requests':lv_count_requests,'count_dga_requests':lv_count_dga_requests, 'requests':lv_requests_by_host})
 

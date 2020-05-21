@@ -1,7 +1,7 @@
 from django.db import models
 from get_model.models import PreparedDataset, PreparedModel
 
-class Requests(models.Model) :
+class Request(models.Model) :
     ip_dst = models.GenericIPAddressField()
     ip_src = models.GenericIPAddressField()
     qname = models.CharField(max_length=250)
