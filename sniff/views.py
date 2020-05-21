@@ -74,7 +74,7 @@ def statistic(iv_request) :
 	if iv_request.user.is_superuser:
 		lv_hosts_list = models.Requests.objects.values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	else:
-		lv_local_dns_ip = iv_request.user.first_name
+		lv_local_dns_ip = iv_request.user.local_dns_ip
 		lv_hosts_list = models.Requests.objects.filter(ip_src=lv_local_dns_ip).values('ip_src').annotate(count=Count('ip_src')).order_by("-count")
 	lv_requests_list = models.Requests.objects.order_by("report_date")
 
@@ -95,4 +95,4 @@ def dashboard(iv_request):
 	if iv_request.user.is_superuser:
 		return render(iv_request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(),'hosts_piechart':plots.hosts_piechart(),'families_piechart':plots.families_piechart()})
 	else:
-		return render(iv_request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(iv_request.user.first_name),'families_piechart':plots.families_piechart(iv_request.user.first_name)})
+		return render(iv_request, 'dash.html', {'dga_lineplot':plots.dga_lineplot(iv_request.user.local_dns_ip),'families_piechart':plots.families_piechart(iv_request.user.local_dns_ip)})

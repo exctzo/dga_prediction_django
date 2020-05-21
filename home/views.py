@@ -31,7 +31,7 @@ def register(iv_request):
 				lv_error = {'form':lv_form, 'error':'User name already taken'}
 				return render(iv_request, 'registration/register.html', lv_error)
 			except :
-				lv_user = User.objects.create_user(username=lv_username, password=lv_password, email=lv_email, first_name=lv_local_dns_ip) 
+				lv_user = User.objects.create_user(username=lv_username, password=lv_password, email=lv_email, local_dns_ip=lv_local_dns_ip) 
 				lv_user.save()
 				login(iv_request, lv_user)
 				return HttpResponseRedirect('/')
