@@ -77,7 +77,7 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
         # Сохранение в логах
         gv_logger.info(iv_ip_src + ' --> ' + iv_ip_dst + ' : ' + iv_qname)
 
-    lv_id_user = User.objects.filter(first_name=ip_src)
+    lv_id_user = User.objects.filter(first_name=iv_ip_src)
 
     # Сохранение в базе
     lv_req = Request(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
