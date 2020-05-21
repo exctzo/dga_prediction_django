@@ -59,7 +59,7 @@ def task_get_data():
     lv_domain_list['subtype'] = pd.factorize(lv_domain_list.family)[0]
     lv_training_data['dga'] = lv_domain_list
     lv_dga_size = lv_training_data['dga'].size
-    lv_family_size = lv_training_data['dga'].groupby('family').size
+    lv_family_size = lv_training_data['dga'].groupby('family').ngroups
     print(lv_dga_size)
     print(lv_family_size)
 
