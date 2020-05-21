@@ -10,7 +10,6 @@ import os
 import pickle
 import random
 import shutil
-import uuid 
 import pandas as pd
 import math
 import numpy as np
@@ -124,7 +123,6 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     lv_model.add(Dense(1))
     lv_model.add(Activation(iv_act_func))
     lv_model.compile(loss='binary_crossentropy', optimizer='rmsprop')
-    lv_binary_model_id = uuid.uuid4
 
     # Построение модели.
     lv_model_dga = Sequential()
@@ -134,7 +132,6 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     lv_model_dga.add(Dense(lv_classes))
     lv_model_dga.add(Activation(iv_act_func))
     lv_model_dga.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop')
-    lv_multiclass_model_id = uuid.uuid4
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'training dga prediction model...'})
     lv_best_auc = 0.0
@@ -152,7 +149,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, lv_auc, lv_best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
-        lv_db_models_stat = models.ModelsLearningStat(uuid=lv_binary_model_id, epoch=ep+1, y_score=lv_y_score, auc=lv_auc, best_auc=lv_best_auc)
+        lv_db_models_stat = models.ModelsLearningStat(epoch=ep+1, y_score=lv_y_score, auc=lv_auc, best_auc=lv_best_auc)
         lv_db_models_stat.save()
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
@@ -163,7 +160,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     # Сохранение модели на диск.
     lv_model.save('get_model/input_data/dga_prediction_model.h5')
 
-    lv_db_models = models.PreparedModels(uuid_head=lv_binary_model_id, model_type='binary', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
+    lv_db_models = models.PreparedModels(model_type='binary', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
         drop_rate=iv_drop_rate, classes='2', act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
     lv_db_models.save()
 
@@ -174,7 +171,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
-    lv_db_models = models.PreparedModels(uuid_head=lv_multiclass_model_id, model_type='multiclass', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
+    lv_db_models = models.PreparedModels(model_type='multiclass', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
         drop_rate=iv_drop_rate, classes=lv_classes, act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
     lv_db_models.save()
 

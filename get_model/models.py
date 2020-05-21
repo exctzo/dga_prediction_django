@@ -7,7 +7,6 @@ class PreparedDatasets(models.Model) :
     family_size = models.IntegerField()
 
 class PreparedModels(models.Model) :
-    uuid_head = models.UUIDField()
     report_date = models.DateTimeField(auto_now_add=True)
     model_type = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
@@ -21,7 +20,6 @@ class PreparedModels(models.Model) :
     batch_size = models.IntegerField()
 
 class ModelsLearningStat(models.Model) :
-    uuid = models.UUIDField()
     report_date = models.DateTimeField(auto_now_add=True)
     epoch = models.IntegerField()
     y_score = models.FloatField()
