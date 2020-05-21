@@ -81,7 +81,7 @@ def checker(iv_qname, iv_ip_src, iv_ip_dst):
 
     # Сохранение в базе
     lv_req = Request(ip_dst=iv_ip_dst, ip_src=iv_ip_src, qname=iv_qname, dga=lv_pred_class, dga_proba=lv_pred_proba, 
-        dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob, id_user=lv_id_user id_dataset=gv_id_dataset, id_model_dga=gv_id_model_dga, id_model_family=gv_id_model_family)
+        dga_subtype=lv_pred_family, dga_subtype_proba = lv_pred_family_prob, id_user=lv_id_user, id_dataset=gv_id_dataset, id_model_dga=gv_id_model_dga, id_model_family=gv_id_model_family)
     lv_req.save()
 
 
