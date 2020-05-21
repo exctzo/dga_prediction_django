@@ -11,5 +11,5 @@ class Request(models.Model) :
     dga_subtype = models.CharField(max_length=250,null=True)
     dga_subtype_proba = models.FloatField(null=True)
     id_dataset = models.ForeignKey(PreparedDataset, on_delete=models.SET_NULL, blank=True, null=True)
-    id_model_dga = models.ForeignKey(PreparedModel, on_delete=models.SET_NULL, blank=True, null=True)
-    id_model_family = models.ForeignKey(PreparedModel, on_delete=models.SET_NULL, blank=True, null=True)
+    id_model_dga = models.ForeignKey(PreparedModel, on_delete=models.SET_NULL, blank=True, null=True, related_name='id_model_dga')
+    id_model_family = models.ForeignKey(PreparedModel, on_delete=models.SET_NULL, blank=True, null=True, related_name='id_model_family')
