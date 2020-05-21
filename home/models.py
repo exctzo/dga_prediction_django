@@ -7,4 +7,4 @@ from django.contrib.auth import get_user_model
 # 	local_dns_ip = models.CharField(max_length=30, default = '0.0.0.0')
 
 user_model = get_user_model()
-user_model.add_to_class("local_dns_ip", models.IPAddressField())
+user_model.add_to_class("local_dns_ip", models.GenericIPAddressField())
