@@ -3,6 +3,7 @@ from django.db import models
 
 class User(models.Model) :
 
+	USERNAME_FIELD = 'username'
 	REQUIRED_FIELDS = ('username','password','email','local_dns_ip')
 
 	username = models.CharField(max_length=250, primary_key=True)
