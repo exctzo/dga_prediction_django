@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.db import models
 # from django.contrib.auth import get_user_model
 
-class User(AbstractBaseUser) :
+class User(AbstractBaseUser,BaseUserManager) :
 
 	USERNAME_FIELD = 'username'
 	REQUIRED_FIELDS = ('password','email','local_dns_ip')
