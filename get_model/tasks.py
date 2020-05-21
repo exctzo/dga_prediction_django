@@ -48,7 +48,7 @@ def task_get_data():
     lv_domain_list['domain'] = lv_domain_list['domain'].map(lambda x: x.split('.')[-2:]).map(lambda x: x[0])
     lv_domain_list['type'] = 0
     lv_training_data['legit'] = lv_domain_list.sample(100000)
-    lv_legit_size = lv_training_data['legit'].size()
+    lv_legit_size = lv_training_data['legit'].size
 
     lv_domain_list = pd.read_csv('get_model/input_data/dga.csv', names=['domain', 'family', 'data'], skiprows = 14, index_col=False)
     lv_domain_list['domain'] = lv_domain_list['domain'].map(lambda x: x.split('.')[0])
@@ -57,8 +57,8 @@ def task_get_data():
     lv_domain_list['type'] = 1
     lv_domain_list['subtype'] = pd.factorize(lv_domain_list.family)[0]
     lv_training_data['dga'] = lv_domain_list
-    lv_dga_size = lv_training_data['dga'].size()
-    lv_family_size = lv_training_data['dga'].groupby('family').size()
+    lv_dga_size = lv_training_data['dga'].size
+    lv_family_size = lv_training_data['dga'].groupby('family').size
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving data...'})
     with open('get_model/input_data/training_data.pkl', 'wb') as lv_f:
