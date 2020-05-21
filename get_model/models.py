@@ -21,7 +21,11 @@ class PreparedModels(models.Model) :
 
 class ModelsLearningStat(models.Model) :
     report_date = models.DateTimeField(auto_now_add=True)
+    model_type = models.CharField(max_length=20)
+    model = models.CharField(max_length=20)
     epoch = models.IntegerField()
-    y_score = models.FloatField()
-    auc = models.FloatField()
-    best_auc = models.FloatField()
+    auc = models.FloatField(default=None)
+    accuracy = models.FloatField()
+    precision = models.FloatField()
+    recall = models.FloatField()
+    f1 = models.FloatField()

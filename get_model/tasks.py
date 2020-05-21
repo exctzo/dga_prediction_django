@@ -114,6 +114,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     lv_X_dga = sequence.pad_sequences(lv_X_dga, maxlen=lv_maxlen)
 
     lv_X_train, lv_X_test, lv_y_train, lv_y_test = train_test_split(lv_X, lv_y, test_size=0.2, random_state=0)
+    lv_X_dga_train, lv_X_dga_test, lv_y_dga_train, lv_y_dga_test = train_test_split(lv_X_dga, lv_y_dga, test_size=0.2, random_state=0)
 
     # Построение модели.
     lv_model = Sequential()
@@ -141,7 +142,13 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         lv_model.fit(lv_X_train, lv_y_train, epochs=1, batch_size=iv_batch_size)
 
         lv_y_score = lv_model.predict_proba(lv_X_test)
+        lv_y_pred = lv_y_score.round()
+
         lv_auc = roc_auc_score(lv_y_test, lv_y_score)
+        lv_accuracy = accuracy_score(lv_y_test, lv_y_pred)
+        lv_precision = precision_score(lv_y_test, lv_y_pred)
+        lv_recall = recall_score(lv_y_test, lv_y_pred)
+        lv_f1 = f1_score(lv_y_test, lv_y_pred)
 
         if lv_auc > lv_best_auc:
             lv_best_auc = lv_auc
@@ -149,7 +156,8 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, lv_auc, lv_best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
-        lv_db_models_stat = models.ModelsLearningStat(epoch=ep+1, y_score=lv_y_score, auc=lv_auc, best_auc=lv_best_auc)
+        lv_db_models_stat = models.ModelsLearningStat(model_type='binary', model='GRU', epoch=ep+1, auc=lv_auc, accuracy=lv_accuracy, 
+            precision=lv_precision, recall=lv_recall, f1=lv_f1)
         lv_db_models_stat.save()
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving dga prediction model...'})
@@ -167,9 +175,20 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     current_task.update_state(state='PROGRESS', meta={'step' : 'training family prediction model...'})
 
     # Обучение модели.
-    lv_model_dga.fit(lv_X_dga, lv_y_dga, epochs=iv_epochs, batch_size=iv_batch_size)
+    lv_model_dga.fit(lv_X_dga_train, lv_y_dga_train, epochs=iv_epochs, batch_size=iv_batch_size)
 
     current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
+
+    lv_y_dga_pred = model_dga.predict_classes(X_dga_test)
+
+    lv_accuracy = accuracy_score(lv_y_dga_test, lv_y_dga_pred)
+    lv_precision = precision_score(lv_y_dga_test, lv_y_dga_pred)
+    lv_recall = recall_score(lv_y_dga_test, lv_y_dga_pred)
+    lv_f1 = f1_score(lv_y_dga_test, lv_y_dga_pred)
+
+    lv_db_models_stat = models.ModelsLearningStat(model_type='multiclass', model='GRU', epoch=iv_epochs, accuracy=lv_accuracy, 
+        precision=lv_precision, recall=lv_recall, f1=lv_f1)
+    lv_db_models_stat.save()
 
     lv_db_models = models.PreparedModels(model_type='multiclass', model='GRU', max_features=lv_max_features, model_units=iv_gru_units, 
         drop_rate=iv_drop_rate, classes=lv_classes, act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
