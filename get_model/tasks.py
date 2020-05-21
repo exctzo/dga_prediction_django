@@ -63,7 +63,7 @@ def task_get_data():
     with open('get_model/input_data/training_data.pkl', 'wb') as lv_f:
         pickle.dump(lv_training_data, lv_f, pickle.HIGHEST_PROTOCOL)
     
-    lv_db_dataset = models.PreparedDatasets(legit_size=lv_legit_size, dga_size=lv_dga_size, family_size=lv_family_size)
+    lv_db_dataset = models.PreparedDataset(legit_size=lv_legit_size, dga_size=lv_dga_size, family_size=lv_family_size)
     lv_db_dataset.save()
     
     return {'step' : 'training data is prepared.'}
@@ -77,7 +77,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     with open('get_model/input_data/training_data.pkl', 'rb') as lv_f:
         lv_training_data = pickle.load(lv_f)
 
-    lv_datasetd_id = models.PreparedDatasets.objects.latest('id').id
+    lv_datasetd_id = models.PreparedDataset.objects.latest('id').id
 
     # Общая коллекция данных.
     lv_all_data_dict = pd.concat([lv_training_data['legit'], lv_training_data['dga']], ignore_index=False, sort=True)
