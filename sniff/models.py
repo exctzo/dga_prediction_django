@@ -1,4 +1,5 @@
 from django.db import models
+from get_model.models import PreparedDatasets, PreparedModel
 
 class Requests(models.Model) :
     ip_dst = models.GenericIPAddressField()
@@ -9,6 +10,6 @@ class Requests(models.Model) :
     dga_proba = models.FloatField()
     dga_subtype = models.CharField(max_length=250,null=True)
     dga_subtype_proba = models.FloatField(null=True)
-    id_dataset = models.ForeignKey('get_model.PreparedDatasets', on_delete=models.SET_NULL, blank=True, null=True)
-    id_model_dga = models.ForeignKey('get_model.PreparedDatasets', on_delete=models.SET_NULL, blank=True, null=True)
-    id_model_family = models.ForeignKey('get_model.PreparedDatasets', on_delete=models.SET_NULL, blank=True, null=True)
+    id_dataset = models.ForeignKey(PreparedDatasets, on_delete=models.SET_NULL, blank=True, null=True)
+    id_model_dga = models.ForeignKey(PreparedModel, on_delete=models.SET_NULL, blank=True, null=True)
+    id_model_family = models.ForeignKey(PreparedDatasets, on_delete=models.SET_NULL, blank=True, null=True)
