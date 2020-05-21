@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login , update_session_auth_hash
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
@@ -27,11 +27,11 @@ def register(iv_request):
 			lv_local_dns_ip = lv_form.cleaned_data.get("local_dns_ip")
 			lv_password = lv_form.cleaned_data.get("password")
 			try :
-				lv_user = User.objects.get(username=uservalue)
+				lv_user = models.User.objects.get(username=uservalue)
 				lv_error = {'form':lv_form, 'error':'User name already taken'}
 				return render(iv_request, 'registration/register.html', lv_error)
 			except :
-				lv_user = User.objects.create_user(username=lv_username, password=lv_password, email=lv_email, local_dns_ip=lv_local_dns_ip) 
+				lv_user = models.User.objects.create_user(username=lv_username, password=lv_password, email=lv_email, local_dns_ip=lv_local_dns_ip) 
 				lv_user.save()
 				login(iv_request, lv_user)
 				return HttpResponseRedirect('/')
