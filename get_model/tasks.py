@@ -177,8 +177,8 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     # Обучение модели.
     lv_model_dga.fit(lv_X_dga_train, lv_y_dga_train, epochs=iv_epochs, batch_size=iv_batch_size)
 
-    current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
-
+    current_task.update_state(state='PROGRESS', meta={'step' : 'counting model scores...'})
+    
     lv_y_dga_pred = lv_model_dga.predict_classes(lv_X_dga_test)
 
     lv_accuracy = accuracy_score(lv_y_dga_test, lv_y_dga_pred)
@@ -196,6 +196,8 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
 
     if os.path.exists('get_model/input_data/family_prediction_model.h5'):
         os.remove('get_model/input_data/family_prediction_model.h5')
+
+    current_task.update_state(state='PROGRESS', meta={'step' : 'saving family prediction model...'})
 
     # Сохранение модели на диск.
     lv_model_dga.save('get_model/input_data/family_prediction_model.h5')
