@@ -77,7 +77,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
     with open('get_model/input_data/training_data.pkl', 'rb') as lv_f:
         lv_training_data = pickle.load(lv_f)
 
-    lv_datasetd_id = models.PreparedDataset.objects.latest('id').id
+    lv_datasetd_id = models.PreparedDataset.objects.latest('id')
 
     # Общая коллекция данных.
     lv_all_data_dict = pd.concat([lv_training_data['legit'], lv_training_data['dga']], ignore_index=False, sort=True)
@@ -159,7 +159,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         lv_status = 'training dga prediction model... Epoch %d (auc = %f, best = %f)' % (ep+1, lv_auc, lv_best_auc)
         current_task.update_state(state='PROGRESS', meta={'step' : lv_status})
 
-        lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model.id, epoch=ep+1, auc=lv_auc, accuracy=lv_accuracy, 
+        lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model, epoch=ep+1, auc=lv_auc, accuracy=lv_accuracy, 
             precision=lv_precision, recall=lv_recall, f1=lv_f1)
         lv_db_model_stat.save()
 
@@ -189,7 +189,7 @@ def task_train_model(iv_output_dim, iv_gru_units, iv_drop_rate, iv_act_func, iv_
         drop_rate=iv_drop_rate, classes=lv_classes, act_func=iv_act_func, test_size='0.2', epochs=iv_epochs, batch_size=iv_batch_size)
     lv_db_model.save()
 
-    lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model.id, epoch=iv_epochs, accuracy=lv_accuracy, 
+    lv_db_model_stat = models.ModelLearningStat(id_model=lv_db_model, epoch=iv_epochs, accuracy=lv_accuracy, 
         precision=lv_precision, recall=lv_recall, f1=lv_f1)
     lv_db_model_stat.save()
 
