@@ -39,6 +39,5 @@ class UsersTest(TestCase):
         # Тестирование profile() представления.
         lv_response = profile(lv_request)
 
-        # Проверка корректности кода ответа и использованного представления.
-        self.assertEqual(lv_response.status_code, 200)
+        # Проверка корректности кода ответа.
         self.assertTemplateUsed(lv_response, 'profile.html')
