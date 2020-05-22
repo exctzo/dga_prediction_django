@@ -24,7 +24,7 @@ class UsersTest(TestCase):
         # Тестирование доступа к get_model() представлению.
         lv_response = get_model(lv_request)
         lv_response.client = Client()
-        self.assertRedirects(lv_response, '/login/', status_code=302)
+        self.assertRedirects(lv_response, 'login/?next=/profile', status_code=302)
 
     def test_user_exist(self):
         # Создание экземпляра GET запроса.
