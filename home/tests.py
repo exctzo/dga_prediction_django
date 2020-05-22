@@ -1,5 +1,6 @@
 from django.test import RequestFactory, TestCase
 from .views import profile
+from get_model.views import get_model
 from django.contrib.auth.models import User
 
 class UsersTest(TestCase):
@@ -19,7 +20,10 @@ class UsersTest(TestCase):
 
         # Проверка корректности кода ответа и использованного представления.
         self.assertEqual(lv_response.status_code, 200)
-        self.assertTemplateUsed(lv_response, 'profile.html')
+
+        # Тестирование доступа к get_model() представлению.
+        lv_response = get_model(lv_request)
+        self.assertRedirects(lv_response, '/login/', status_code=302)
 
     def test_user_exist(self):
         # Создание экземпляра GET запроса.
