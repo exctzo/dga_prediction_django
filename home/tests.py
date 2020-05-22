@@ -40,4 +40,4 @@ class UsersTest(TestCase):
         lv_response = profile(lv_request)
 
         # Проверка корректности кода ответа.
-        self.assertTemplateUsed(lv_response, 'profile.html')
+        self.assertEqual(lv_response.status_code, 200)
