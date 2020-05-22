@@ -82,7 +82,7 @@ class GetDataModelTest(TestCase):
         lv_classes = len(lv_family_dict)
         lv_X_dga = np.array(lv_dga_data_dict['domain'].tolist())
         lv_y_dga = np.array(lv_dga_data_dict['subtype'].tolist())
-        lv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(lv_X)))}
+        lv_valid_chars = {x:idx+1 for idx, x in enumerate(set(''.join(lv_X_dga)))}
         lv_max_features = len(lv_valid_chars) + 1
         lv_maxlen = np.max([len(x) for x in lv_X_dga])
         lv_X_dga = [[lv_valid_chars[y] for y in x] for x in lv_X_dga]
