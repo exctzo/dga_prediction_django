@@ -1,6 +1,7 @@
 from django.test import RequestFactory, TestCase
 from .models import Request
 import socket
+import pydig
 
 class SniffTestCase(TestCase):
     def setUp(self):
@@ -45,7 +46,7 @@ class SniffTestCase(TestCase):
     def test_proxy_requests(self):
         iv_dns_up_ip = '8.8.8.8'
         iv_interface = os.listdir('/sys/class/net/')[1]
-        iv_port = '9981'
+        iv_port = 9981
         lv_host = ''
         # Настройка udp сервера для получения dns запросов.
         lv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -54,4 +55,8 @@ class SniffTestCase(TestCase):
         lv_data, lv_addr = lv_sock.recvfrom(1024)
         lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
         lv_th.start()
+        
+        resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',], additional_args=['-p 9981',])
+        answ = resolver.query('example.com', 'A')
 
+        assert answ is not None
