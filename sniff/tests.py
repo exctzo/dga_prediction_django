@@ -2,6 +2,10 @@ from django.test import RequestFactory, TestCase
 from .models import Request
 import socket
 import pydig
+from threading import Thread
+from scapy.all import *
+from scapy.layers.dns import DNS
+from scapy.layers.inet import IP
 
 class SniffTestCase(TestCase):
     def setUp(self):
