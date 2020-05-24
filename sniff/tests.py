@@ -6,6 +6,7 @@ from threading import Thread
 from scapy.all import *
 from scapy.layers.dns import DNS
 from scapy.layers.inet import IP
+from . import Handler
 
 class SniffTestCase(TestCase):
     def setUp(self):
@@ -35,7 +36,7 @@ class SniffTestCase(TestCase):
         return lv_data
 
 
-    def AddHandler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
+    def Handler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
         # Новый поток для обработки udp запроса на tcp запрос.
         lv_TCPanswer = SendTCP(iv_dns_up_ip, iv_data)
         lv_UDPanswer = lv_TCPanswer[2:]
@@ -57,7 +58,7 @@ class SniffTestCase(TestCase):
         lv_sock.bind((lv_host, iv_port))
 
         lv_data, lv_addr = lv_sock.recvfrom(1024)
-        lv_th = Thread(target=AddHandler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
+        lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
         lv_th.start()
         
         resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',], additional_args=['-p 9981',])
