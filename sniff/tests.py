@@ -54,7 +54,7 @@ class SniffTestCase(TestCase):
         lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
         lv_th.start()
         
-        resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',], additional_args=['-p 9981',])
-        answ = resolver.query('example.com', 'A')
+        resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',])
+        answ = resolver.query('-p 9981 example.com', 'A')
 
         assert answ is not None
