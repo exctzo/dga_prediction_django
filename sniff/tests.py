@@ -6,13 +6,15 @@ from threading import Thread
 from scapy.all import *
 from scapy.layers.dns import DNS
 from scapy.layers.inet import IP
-from . import Handler
 
 class SniffTestCase(TestCase):
     def setUp(self):
         self.req = Request.objects.create(ip_dst='68.183.21.239', ip_src='243.19.14.144', 
             qname='ajsfhkjshf.com', dga='1', dga_proba='0.7', 
             dga_subtype='fwefsd', dga_subtype_proba = '0.3')
+        
+        self.sendtcp = SendTCP()
+        self.handler = Handler()
 
     def test_requests_models(self):
         # Получение запроса через ip_src
@@ -38,7 +40,7 @@ class SniffTestCase(TestCase):
 
     def Handler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
         # Новый поток для обработки udp запроса на tcp запрос.
-        lv_TCPanswer = SendTCP(iv_dns_up_ip, iv_data)
+        lv_TCPanswer = sendtcp(iv_dns_up_ip, iv_data)
         lv_UDPanswer = lv_TCPanswer[2:]
         iv_socket.sendto(lv_UDPanswer, iv_addr)
 
@@ -58,7 +60,7 @@ class SniffTestCase(TestCase):
         lv_sock.bind((lv_host, iv_port))
 
         lv_data, lv_addr = lv_sock.recvfrom(1024)
-        lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
+        lv_th = Thread(target=handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
         lv_th.start()
         
         resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',], additional_args=['-p 9981',])
