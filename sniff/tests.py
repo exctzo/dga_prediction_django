@@ -51,8 +51,10 @@ class SniffTestCase(TestCase):
         lv_sock.bind((lv_host, iv_port))
 
         lv_data, lv_addr = lv_sock.recvfrom(1024)
-        lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
-        lv_th.start()
+        # lv_th = Thread(target=Handler, args=(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
+        # lv_th.start()
+
+        print(Handler(lv_data, lv_addr, lv_sock, iv_dns_up_ip, iv_interface))
         
         # resolver = pydig.Resolver(executable='/usr/bin/dig', nameservers=['exctzo.tech',], additional_args=['-p9981',])
         # answ = resolver.query('example.com', 'A')
