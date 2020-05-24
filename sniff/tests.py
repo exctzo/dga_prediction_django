@@ -12,14 +12,7 @@ class SniffTestCase(TestCase):
         self.req = Request.objects.create(ip_dst='68.183.21.239', ip_src='243.19.14.144', 
             qname='ajsfhkjshf.com', dga='1', dga_proba='0.7', 
             dga_subtype='fwefsd', dga_subtype_proba = '0.3')
-
-    def test_requests_models(self):
-        # Получение запроса через ip_src
-        req = Request.objects.get(ip_src='243.19.14.144')
-
-        # Проверка корректности полученного доменного имени
-        self.assertEqual(req.qname,'ajsfhkjshf.com')
-
+    
     def SendTCP(iv_dns_up_ip, iv_query):
         # Отправка tcp запросов на вышестоящий dns сервер.
         lv_server = (iv_dns_up_ip, 53)
@@ -33,8 +26,7 @@ class SniffTestCase(TestCase):
         lv_sock.send(lv_tcp_query)  	
         lv_data = lv_sock.recv(1024)
         return lv_data
-
-
+    
     def Handler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
         # Новый поток для обработки udp запроса на tcp запрос.
         lv_TCPanswer = SendTCP(iv_dns_up_ip, iv_data)
@@ -46,6 +38,13 @@ class SniffTestCase(TestCase):
         lv_ip_dst = gv_interface_ip
         lv_layerDNS = DNS(iv_data)
         lv_qname = lv_layerDNS.qd.qname.decode("utf-8")
+
+    def test_requests_models(self):
+        # Получение запроса через ip_src
+        req = Request.objects.get(ip_src='243.19.14.144')
+
+        # Проверка корректности полученного доменного имени
+        self.assertEqual(req.qname,'ajsfhkjshf.com')
     
     def test_proxy_requests(self):
         iv_dns_up_ip = '8.8.8.8'
