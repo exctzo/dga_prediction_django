@@ -28,12 +28,6 @@ def Handler(iv_data, iv_addr, iv_socket, iv_dns_up_ip, iv_interface):
     lv_UDPanswer = lv_TCPanswer[2:]
     iv_socket.sendto(lv_UDPanswer, iv_addr)
 
-    # Извлечение запрашиваемого домена, ip адресов.
-    lv_ip_src = iv_addr[0]
-    lv_ip_dst = gv_interface_ip
-    lv_layerDNS = DNS(iv_data)
-    lv_qname = lv_layerDNS.qd.qname.decode("utf-8")
-
 class SniffTestCase(TestCase):
     def setUp(self):
         self.req = Request.objects.create(ip_dst='68.183.21.239', ip_src='243.19.14.144', 
